@@ -1,10 +1,4 @@
-<<<<<<< HEAD
 # Team SH27 Main Project - Team Project 3 Course 2023-24
-=======
-# 2023 TEAM cs27 Project
->>>>>>> 254cb02f065acb3b8f70ae14c040e32cae505f96
-
-
 
 ## Getting started
 
