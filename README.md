@@ -1,4 +1,4 @@
-# SH27 Main
+# Team SH27 Main Project
 
 
 
