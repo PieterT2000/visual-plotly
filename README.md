@@ -1,5 +1,8 @@
 # Team SH27 Main Project - Team Project 3 Course 2023-24
 
+## Requirements
+- Node.js version > 14.8
+
 ## Getting started
 
 To make it easy for you to get started with GitLab, here's a list of recommended next steps. Test
