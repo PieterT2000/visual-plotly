@@ -11,13 +11,26 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@radix-ui/react-alert-dialog": "^1.0.5",
+    "@radix-ui/react-dialog": "^1.0.5",
+    "@radix-ui/react-label": "^2.0.2",
+    "@radix-ui/react-select": "^2.0.0",
+    "@radix-ui/react-slot": "^1.0.2",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.0.0",
+    "lodash.get": "^4.4.2",
+    "lucide-react": "^0.293.0",
     "plotly.js": "^2.27.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-plotly.js": "^2.6.0"
+    "react-plotly.js": "^2.6.0",
+    "tailwind-merge": "^2.0.0",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@types/jest": "^29.5.7",
+    "@types/lodash.get": "^4.4.9",
+    "@types/node": "^20.10.0",
     "@types/plotly.js": "^2.12.29",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",

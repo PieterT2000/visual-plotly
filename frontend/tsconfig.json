@@ -21,7 +21,26 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    /* Path resolving */
+    "baseUrl": ".",
+    "paths": {
+      "src/*": [
+        "./src/*"
+      ],
+      "@/*": [
+        "./src/*"
+      ],
+      "components/*": [
+        "./src/components/*"
+      ],
+      "utils": [
+        "./src/utils/index.ts"
+      ],
+      "utils/*": [
+        "./src/utils/*"
+      ],
+    }
   },
   "include": [
     "src"
