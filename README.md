@@ -1,12 +1,18 @@
+[![pipeline status](https://stgit.dcs.gla.ac.uk/team-project-h/2023/sh27/sh27-main/badges/main/pipeline.svg)](https://stgit.dcs.gla.ac.uk/team-project-h/2023/sh27/sh27-main/-/commits/main)
+
 # Team SH27 Main Project - Team Project 3 Course 2023-24
 
-## Requirements
+### Deployment
+
+The frontend is temporarily deployed [here](https://plotly.pietervantuijl.com).
+
+### Requirements
 
 - Node.js version > 14.8
 
 - **Node.js**: Node.js can be downloaded and installed from [Node.js Official Website](https://nodejs.org/en/download). This will also install `npm` automatically, which is the package manager for Node.js.
 
-## Installation
+### Installation
 
 Follow these steps to set up the project locally:
 
