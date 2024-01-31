@@ -1,28 +1,25 @@
-import Chart from "./Chart";
-import "./App.css";
-import { Dropzone } from "./Dropzone";
+import { Dropzone } from "./components/upload/Dropzone";
 import { useState } from "react";
 import { TypographyH1 } from "./components/ui/h1";
 import { TypographyP } from "./components/ui/p";
-import ConfigurationDialog from "./ConfigurationDialog";
+import ConfigurationDialog from "./components/charts/configuration";
+import Layout from "./components/layout/Layout";
+import ChartsProvider from "./providers/ChartsProvider";
+import NavBar from "./components/layout/NavBar";
 
 type View = "chart" | "dropzone";
 
 function App() {
-  const [view] = useState<View>("dropzone");
-  const [showDialog, setShowDialog] = useState<boolean>(false);
+  const [view, setView] = useState<View>("dropzone");
   const [fileUrls, setFileUrls] = useState<string[]>([]);
 
-  console.log(showDialog);
-
-  const onFileUpload = (urls: string[]) => {
-    console.log("on file upload");
+  const onSuccessfulFileUpload = (urls: string[]) => {
     setFileUrls(urls);
-    setShowDialog(true);
+    setView("chart");
   };
 
   return (
-    <div>
+    <>
       {view === "dropzone" && (
         <div className="h-screen flex flex-col justify-center items-center space-y-12">
           <TypographyH1>Visual Plotly</TypographyH1>
@@ -33,18 +30,21 @@ function App() {
           </TypographyP>
           <Dropzone
             className="h-1/3 flex justify-center items-center w-full"
-            onChange={onFileUpload}
-            fileExtension="json"
+            onContinue={onSuccessfulFileUpload}
           />
         </div>
       )}
-      {view === "chart" && <Chart title="Bar Chart" />}
-      <ConfigurationDialog
-        files={fileUrls}
-        dialogOpen={showDialog}
-        setDialogOpen={setShowDialog}
-      />
-    </div>
+      {view === "chart" && (
+        <ChartsProvider files={fileUrls}>
+          <Layout>
+            <NavBar />
+            <div className="flex flex-col grow">
+              <ConfigurationDialog />
+            </div>
+          </Layout>
+        </ChartsProvider>
+      )}
+    </>
   );
 }
 
