@@ -4,7 +4,11 @@ Welcome to the SH27 project! We're glad you're interested in contributing. Befor
 
 ## Branch Strategy
 
-- For any new features or bug fixes, always checkout from the `develop` branch.
+- Make sure the `develop` branch you are using in your local repo up-to-date with the remote repo first: <br>
+  `git checkout develop ` <br>
+  `git pull origin develop`
+- For any new features or bug fixes, always checkout from the `develop` branch: <br>
+  `git checkout -b feature-branch-name`
 - Use the following format for branch names: `{issue-number}-{issue-title}`. For example, `42-fix-login-Issue`.
 
 ## Pull Requests
