@@ -21,7 +21,7 @@ const NavBar = () => {
   };
 
   return (
-    <div className="flex flex-col space-y-4 h-screen justify-center items-center px-8">
+    <div className="flex flex-col space-y-4 overflow-y-auto max-h-[calc(100vh-4rem)] justify-center items-center px-8">
       {charts.map((chart) => (
         <button
           key={chart.id}

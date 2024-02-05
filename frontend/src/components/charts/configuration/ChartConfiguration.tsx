@@ -115,7 +115,7 @@ const ConfigurationDialog = () => {
   return (
     <div className="flex items-center h-full">
       <div className="space-y-4 w-[500px] bg-cgray h-full flex flex-col justify-center">
-        <div className="border-secondary border-b flex">
+        <div className="border-secondary border-b flex overflow-x-auto whitespace-nowrap">
           {activeChart?.traces.map((trace, idx) => (
             <Button
               key={trace.id}
