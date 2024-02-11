@@ -62,6 +62,7 @@ const ConfigurationDialog = () => {
     activeTrace,
     handleAddTrace,
     handleUpdateTrace,
+    handleUpdateChart,
     setActiveTraceId,
   } = useChartsContext();
   const dataKeys = findArrayPaths(data);
@@ -115,7 +116,20 @@ const ConfigurationDialog = () => {
   return (
     <div className="flex items-center h-full">
       <div className="space-y-4 w-[500px] bg-cgray h-full flex flex-col justify-center">
-        <div className="border-secondary border-b flex overflow-x-auto whitespace-nowrap">
+        <div className="p-4 space-y-2">
+          <Label htmlFor="chartTitle">Chart Title</Label>
+          <Input
+            id="chartTitle"
+            type="text"
+            value={activeChart?.name ?? ""}
+            onChange={(e) =>
+              handleUpdateChart({ ...activeChart, name: e.target.value })
+            }
+            className="shadow-sm border-none rounded-sm"
+            placeholder="Enter chart title"
+          />
+        </div>
+        <div className="border-secondary border-b flex">
           {activeChart?.traces.map((trace, idx) => (
             <Button
               key={trace.id}
@@ -139,14 +153,14 @@ const ConfigurationDialog = () => {
           </Button>
         </div>
         <div className="p-4 space-y-2">
-          <Label htmlFor="chartTitle">Trace Label</Label>
+          <Label htmlFor="traceTitle">Trace Label</Label>
           <Input
-            name="chartTitle"
+            name="traceTitle"
             type="text"
             value={activeTrace?.label}
             onChange={(e) => handleUpdateTrace({ label: e.target.value })}
             className="shadow-sm border-none rounded-sm"
-            placeholder="Chart name"
+            placeholder="Enter trace label"
           />
           <ConfigurationSelect
             label="Data key"
@@ -253,7 +267,7 @@ const ConfigurationDialog = () => {
           </div>
         </div>
       </div>
-      <div className="flex grow flex-col justify-center h-[600px]">
+      <div className="flex grow flex-col justify-center min-h-screen">
         <BasicChart data={activeChartData} />
       </div>
     </div>
