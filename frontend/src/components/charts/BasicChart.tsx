@@ -28,9 +28,7 @@ const plotDataSelectors: Record<ChartType, PlotDataSelector> = {
       marker: {
         color: trace.color,
       },
-      title: {
-        text: trace.label,
-      },
+      name: trace.label,
     };
   },
   pie: (data, trace: Trace) => {
@@ -41,9 +39,6 @@ const plotDataSelectors: Record<ChartType, PlotDataSelector> = {
       type: "pie",
       labels,
       values,
-      title: {
-        text: trace.label,
-      },
     };
   },
   scatter: (data, trace: Trace) => {
@@ -54,9 +49,7 @@ const plotDataSelectors: Record<ChartType, PlotDataSelector> = {
       x: xValues,
       y: yValues,
       mode: "markers",
-      title: {
-        text: trace.label,
-      },
+      name: trace.label,
     };
   },
   line: (data, trace: Trace) => {
@@ -70,9 +63,7 @@ const plotDataSelectors: Record<ChartType, PlotDataSelector> = {
       line: {
         color: trace.lineColor,
       },
-      title: {
-        text: trace.label,
-      },
+      name: trace.label,
     };
   },
 };
