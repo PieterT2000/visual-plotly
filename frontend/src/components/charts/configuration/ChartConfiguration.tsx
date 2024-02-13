@@ -224,6 +224,8 @@ const ConfigurationDialog = () => {
             />
           </div>
           <div className="flex space-x-4">
+          {
+            activeTrace?.chartType.some(option => option.value === 'bar') && (
             <div className="flex items-center space-x-2">
               <Label htmlFor="chartType">Bar Color</Label>
               <div className="relative w-[30px] h-[30px] ">
@@ -244,6 +246,11 @@ const ConfigurationDialog = () => {
                 )}
               </div>
             </div>
+            )
+                    }
+
+          {
+            activeTrace?.chartType.some(option => option.value === 'line') && (
             <div className="flex items-center space-x-2">
               <Label htmlFor="chartType">Line Color</Label>
               <div className="relative w-[30px] h-[30px] ">
@@ -264,6 +271,10 @@ const ConfigurationDialog = () => {
                 )}
               </div>
             </div>
+              )
+            }
+
+
           </div>
         </div>
       </div>
