@@ -80,6 +80,6 @@ deploy:s3:
     - if: $CI_COMMIT_BRANCH == "main"
       variables:
         ENV_NAME: production
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" || $CI_COMMIT_BRANCH == "develop"
       variables:
         ENV_NAME: staging

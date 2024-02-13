@@ -1,10 +1,13 @@
-[![pipeline status](https://stgit.dcs.gla.ac.uk/team-project-h/2023/sh27/sh27-main/badges/main/pipeline.svg)](https://stgit.dcs.gla.ac.uk/team-project-h/2023/sh27/sh27-main/-/commits/main)
+Production [![pipeline status](https://stgit.dcs.gla.ac.uk/team-project-h/2023/sh27/sh27-main/badges/main/pipeline.svg)](https://stgit.dcs.gla.ac.uk/team-project-h/2023/sh27/sh27-main/-/commits/main)
+
+Staging [![pipeline status](https://stgit.dcs.gla.ac.uk/team-project-h/2023/sh27/sh27-main/badges/develop/pipeline.svg)](https://stgit.dcs.gla.ac.uk/team-project-h/2023/sh27/sh27-main/-/commits/develop)
 
 # Team SH27 Main Project - Team Project 3 Course 2023-24
 
 ### Deployment
 
-The frontend is temporarily deployed [here](https://plotly.pietervantuijl.com).
+- [Production](https://plotly.pietervantuijl.com)
+- [Staging/develop](https://plotly-staging.pietervantuijl.com)
 
 ### Requirements
 
