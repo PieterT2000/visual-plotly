@@ -66,15 +66,15 @@ deploy:s3:
   environment:
     name: $ENV_NAME
   script:
-    - if [ "$ENV_NAME" = "production" ]; then S3_BUCKET=$S3_BUCKET_PROD; fi
-    - if [ "$ENV_NAME" = "staging" ]; then S3_BUCKET=$S3_BUCKET_STAGING; fi
+    - if [ "$ENV_NAME" = "production" ]; then S3_BUCKET=$S3_BUCKET_PROD; CLOUDFRONT_ID=ED87W9YWEWNCM; fi
+    - if [ "$ENV_NAME" = "staging" ]; then S3_BUCKET=$S3_BUCKET_STAGING; CLOUDFRONT_ID=EDZU9V56VO4O9; fi
     - echo "Deploying to $ENV_NAME, S3 bucket is $S3_BUCKET"
     - export AWS_DEFAULT_REGION=eu-west-2
     - export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
     - export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
     - aws s3 sync frontend/dist/ s3://$S3_BUCKET
     # https://stackoverflow.com/a/37752872/9713831 - clear CloudFront cache
-    - aws cloudfront create-invalidation --distribution-id=ED87W9YWEWNCM --paths /
+    - aws cloudfront create-invalidation --distribution-id=$CLOUDFRONT_ID --paths /
   # https://gitlab.com/gitlab-org/gitlab/-/issues/357792
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
