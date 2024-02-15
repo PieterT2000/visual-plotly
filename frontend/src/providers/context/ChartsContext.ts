@@ -19,6 +19,8 @@ export const defaultChart = {
   image: "",
   xAxisLabel: "X Axis",
   yAxisLabel: "Y Axis",
+  title: "Daily Revenue",
+  description: "The Daily Revenue Chart provides a visual representation of the revenue generated each day.",
 };
 
 const defaultContext = {
@@ -46,6 +48,7 @@ export interface IChartsContext {
   activeChart?: Chart;
   activeTrace?: Trace;
   // eslint-disable-next-line
+  /** The data dict uploaded from the JSON file */
   data: any;
   chartThumbs: { [key: string]: string };
   handleAddChart: () => void;

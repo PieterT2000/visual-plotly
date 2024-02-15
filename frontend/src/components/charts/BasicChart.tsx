@@ -1,21 +1,29 @@
-import Plot from "react-plotly.js";
-import { Data } from "plotly.js-dist-min";
-import { useMemo } from "react";
+import Plotly from "plotly.js-cartesian-dist-min";
+import { Data } from "plotly.js-cartesian-dist-min";
+import createPlotlyComponent from "react-plotly.js/factory";
+import { PlotParams } from "react-plotly.js";
+import { forwardRef, useMemo, useRef } from "react";
 import {
   Trace,
   ChartType,
   useChartsContext,
 } from "src/providers/context/ChartsContext";
 import { useChartImageCapture } from "src/hooks/useChartImageCapture";
+import get from "lodash.get";
+
+// Use custom Plotly build
+const Plot = createPlotlyComponent(Plotly) as React.ComponentClass<PlotParams>;
 
 interface BasicChartProps {
-  data: { [key: string]: number | string }[][];
+  chartId: string;
 }
 
+type DataToBePlotted = { [key: string]: number | string }[];
+
 type PlotDataSelector = (
-  data: BasicChartProps["data"][0],
+  data: DataToBePlotted,
   traceConfig: Trace
-) => Data;
+) => Data & { extra: object };
 
 const plotDataSelectors: Record<ChartType, PlotDataSelector> = {
   bar: (data, trace: Trace) => {
@@ -29,6 +37,9 @@ const plotDataSelectors: Record<ChartType, PlotDataSelector> = {
         color: trace.color,
       },
       name: trace.label,
+      extra: {
+        aspect: 4 / 3,
+      },
     };
   },
   pie: (data, trace: Trace) => {
@@ -39,6 +50,9 @@ const plotDataSelectors: Record<ChartType, PlotDataSelector> = {
       type: "pie",
       labels,
       values,
+      extra: {
+        aspect: 1,
+      },
     };
   },
   scatter: (data, trace: Trace) => {
@@ -50,6 +64,9 @@ const plotDataSelectors: Record<ChartType, PlotDataSelector> = {
       y: yValues,
       mode: "markers",
       name: trace.label,
+      extra: {
+        aspect: 4 / 3,
+      },
     };
   },
   line: (data, trace: Trace) => {
@@ -64,30 +81,73 @@ const plotDataSelectors: Record<ChartType, PlotDataSelector> = {
         color: trace.lineColor,
       },
       name: trace.label,
+      extra: {
+        aspect: 4 / 3,
+      },
     };
   },
 };
 
-const BasicChart = (props: BasicChartProps) => {
-  const { activeChart: chartConfig } = useChartsContext();
-  const { data } = props;
+export const defaultChartHeight = 400;
+
+const BasicChart = forwardRef((props: BasicChartProps, ref: React.Ref<any>) => {
+  const localRef = useRef(null);
+  const chartRef = ref || localRef;
+  // chartsData
+  const { charts, data: chartsData } = useChartsContext();
+
+  const chartConfig = useMemo(() => {
+    return charts.find((chart) => chart.id === props.chartId);
+  }, [props.chartId, charts]);
+
+  // Data are the values to be plotted
+  const data = useMemo(() => {
+    return (
+      chartConfig?.traces.map((trace) =>
+        get(chartsData, trace.selectedDataKey, [])
+      ) ?? []
+    );
+  }, [chartConfig, chartsData]);
+
   const plotData = useMemo(() => {
     if (!chartConfig) return [];
-    return chartConfig.traces.reduce((acc: Data[], traceConfig, idx) => {
-      const { chartType } = traceConfig;
-      if (chartType.length === 0 || data.length === 0) return acc;
-      acc.push(plotDataSelectors[chartType[0].value](data[idx], traceConfig));
-      return acc;
-    }, []);
+    return chartConfig.traces.reduce(
+      (acc: ReturnType<PlotDataSelector>[], traceConfig, idx) => {
+        const { chartType } = traceConfig;
+        if (chartType.length === 0 || data.length === 0) return acc;
+        const plotData = plotDataSelectors[chartType[0].value](
+          data[idx],
+          traceConfig
+        );
+        acc.push(plotData);
+        return acc;
+      },
+      []
+    );
   }, [data, chartConfig]);
 
-  useChartImageCapture(plotData);
+  useChartImageCapture(plotData, props.chartId);
+
+  const dimensions = useMemo(() => {
+    // @ts-ignore
+    const aspect = plotData[0]?.aspect ?? 4 / 3;
+    return {
+      width: Math.round(aspect * defaultChartHeight),
+      height: defaultChartHeight,
+    };
+  }, [plotData]);
+
+  const filteredPlotData = useMemo(
+    () => plotData.filter((data) => removeObjectKeys(data, ["extra"])),
+    [plotData]
+  );
 
   return (
     <Plot
+      ref={chartRef}
       useResizeHandler
-      style={{ width: "100%", height: "100%" }}
-      data={plotData}
+      style={dimensions}
+      data={filteredPlotData}
       layout={{
         autosize: true,
         title: chartConfig?.name,
@@ -96,6 +156,15 @@ const BasicChart = (props: BasicChartProps) => {
       }}
     />
   );
-};
+});
 
 export default BasicChart;
+
+function removeObjectKeys<T extends Record<string, any>>(
+  obj: T,
+  keys: (keyof T)[]
+): Partial<T> {
+  return Object.fromEntries(
+    Object.entries(obj).filter(([key]) => !keys.includes(key))
+  ) as Partial<T>;
+}

@@ -2,7 +2,7 @@ import { Dropzone } from "./components/upload/Dropzone";
 import { useState } from "react";
 import { TypographyH1 } from "./components/ui/h1";
 import { TypographyP } from "./components/ui/p";
-import ConfigurationDialog from "./components/charts/configuration";
+import ChartConfiguration from "./components/charts/configuration";
 import Layout from "./components/layout/Layout";
 import ChartsProvider from "./providers/ChartsProvider";
 import NavBar from "./components/layout/NavBar";
@@ -39,7 +39,7 @@ function App() {
           <Layout>
             <NavBar />
             <div className="flex flex-col grow">
-              <ConfigurationDialog />
+              <ChartConfiguration />
             </div>
           </Layout>
         </ChartsProvider>

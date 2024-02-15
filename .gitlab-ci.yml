@@ -11,8 +11,11 @@ variables:
   npm_config_cache: "$CI_PROJECT_DIR/.npm"
 
 default:
-  image: stgit.dcs.gla.ac.uk:5050/team-project-h/2023/sh27/sh27-main
+  image: node:18
   interruptible: true
+  # Provide tag to ensure jobs are picked up by the right runner
+  tags:
+    - node
 
 # Hidden npm cache handling job re-used by all other jobs
 .dependencies_cache:
@@ -54,6 +57,7 @@ build:
     - .dependencies_cache
   before_script:
     - cd frontend
+    - npm ci --prefer-offline
   script:
     - npm run build
   artifacts:
@@ -65,6 +69,10 @@ deploy:s3:
   stage: deploy
   environment:
     name: $ENV_NAME
+  image:
+    name: amazon/aws-cli:latest
+    entrypoint:
+      - "/usr/bin/env"
   script:
     - if [ "$ENV_NAME" = "production" ]; then S3_BUCKET=$S3_BUCKET_PROD; CLOUDFRONT_ID=ED87W9YWEWNCM; fi
     - if [ "$ENV_NAME" = "staging" ]; then S3_BUCKET=$S3_BUCKET_STAGING; CLOUDFRONT_ID=EDZU9V56VO4O9; fi

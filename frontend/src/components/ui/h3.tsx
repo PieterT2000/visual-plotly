@@ -1,6 +1,6 @@
 import { cn } from "src/utils";
 
-export function TypographyH1({
+export function TypographyH3({
   children,
   className,
 }: {
@@ -8,13 +8,13 @@ export function TypographyH1({
   className?: string;
 }) {
   return (
-    <h1
+    <h3
       className={cn(
-        "scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl",
+        "scroll-m-20 text-2xl font-semibold tracking-tight",
         className
       )}
     >
       {children}
-    </h1>
+    </h3>
   );
 }

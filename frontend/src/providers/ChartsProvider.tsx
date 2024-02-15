@@ -15,6 +15,8 @@ const emptyChart = {
   image: "",
   xAxisLabel: "",
   yAxisLabel: "",
+  title: "",
+  description: "",
 };
 
 const defaultPlotlyColors = [

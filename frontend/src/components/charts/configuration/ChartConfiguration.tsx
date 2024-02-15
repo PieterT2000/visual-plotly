@@ -15,6 +15,9 @@ import {
   ChartTypeOption,
 } from "src/providers/context/ChartsContext";
 import { TwitterPicker } from "react-color";
+import Canvas from "src/components/canvas/Canvas";
+import ChartConfigFields from "./ChartConfigFields";
+import { TypographyH3 } from "src/components/ui";
 
 function renderDataKeyList(
   value: GroupedObject | string | string[],
@@ -47,7 +50,7 @@ function renderDataKeyList(
   }
 }
 
-const ConfigurationDialog = () => {
+const ChartConfiguration = () => {
   /**
    * TODO: combine into one color picker
    */
@@ -58,11 +61,11 @@ const ConfigurationDialog = () => {
 
   const {
     data,
+    charts,
     activeChart,
     activeTrace,
     handleAddTrace,
     handleUpdateTrace,
-    handleUpdateChart,
     setActiveTraceId,
   } = useChartsContext();
   const dataKeys = findArrayPaths(data);
@@ -84,208 +87,205 @@ const ConfigurationDialog = () => {
     handleUpdateTrace({ chartType: options as ChartTypeOption[] });
   };
 
-  const [xAxisKeys, yAxisKeys, activeChartData, chartTypeOptions] =
-    useMemo(() => {
-      if (!activeTrace) return [[], [], [], []];
+  const [xAxisKeys, yAxisKeys, chartTypeOptions] = useMemo(() => {
+    if (!activeTrace) return [[], [], [], []];
 
-      const { selectedDataKey, xAxisKey, yAxisKey } = activeTrace;
+    const { selectedDataKey, xAxisKey, yAxisKey } = activeTrace;
 
-      const axisKeys = Object.keys(get(data, `${selectedDataKey}.0`, {}));
-      const activeTraceData = get(data, selectedDataKey, []);
-      const activeChartData =
-        activeChart?.traces.map((trace) =>
-          get(data, trace.selectedDataKey, [])
-        ) ?? [];
-      const xAxisKeys = axisKeys.filter((key: string) => key !== yAxisKey);
-      const yAxisKeys = axisKeys.filter((key: string) => key !== xAxisKey);
+    const axisKeys = Object.keys(get(data, `${selectedDataKey}.0`, {}));
+    const activeTraceData = get(data, selectedDataKey, []);
+    const xAxisKeys = axisKeys.filter((key: string) => key !== yAxisKey);
+    const yAxisKeys = axisKeys.filter((key: string) => key !== xAxisKey);
 
-      const validChartTypes = determineValidChartTypes({
-        // eslint-disable-next-line
-        xValues: activeTraceData.map((item: any) => item[xAxisKey]),
-        // eslint-disable-next-line
-        yValues: activeTraceData.map((item: any) => item[yAxisKey]),
-      });
-      const chartTypeOptions = validChartTypes.map((chartType) => ({
-        value: chartType,
-        label: capitalize(chartType) + " Chart",
-      }));
+    const validChartTypes = determineValidChartTypes({
+      // eslint-disable-next-line
+      xValues: activeTraceData.map((item: any) => item[xAxisKey]),
+      // eslint-disable-next-line
+      yValues: activeTraceData.map((item: any) => item[yAxisKey]),
+    });
+    const chartTypeOptions = validChartTypes.map((chartType) => ({
+      value: chartType,
+      label: capitalize(chartType) + " Chart",
+    }));
 
-      return [xAxisKeys, yAxisKeys, activeChartData, chartTypeOptions];
-    }, [activeChart, activeTrace, data]);
+    return [xAxisKeys, yAxisKeys, chartTypeOptions];
+  }, [activeTrace, data]);
+
+  const activeChartIdx = charts.findIndex(
+    (chart) => chart.id === activeChart?.id
+  );
 
   return (
     <div className="flex items-center h-full">
-      <div className="space-y-4 w-[500px] bg-cgray h-full flex flex-col justify-center">
-        <div className="p-4 space-y-2">
-          <Label htmlFor="chartTitle">Chart Title</Label>
-          <Input
-            id="chartTitle"
-            type="text"
-            value={activeChart?.name ?? ""}
-            onChange={(e) =>
-              handleUpdateChart({ ...activeChart, name: e.target.value })
-            }
-            className="shadow-sm border-none rounded-sm"
-            placeholder="Enter chart title"
-          />
-        </div>
-        <div className="border-secondary border-b flex">
-          {activeChart?.traces.map((trace, idx) => (
+      <div className="space-y-8 w-[400px] lg:w-[500px] bg-cgray h-full flex flex-col justify-center">
+        <ChartConfigFields />
+        <div className="px-2">
+          <TypographyH3 className="mb-6">Traces Options</TypographyH3>
+          <div className="border-secondary border-b flex mx-2 mb-4">
+            {activeChart?.traces.map((trace, idx) => (
+              <Button
+                key={trace.id}
+                className={cn(
+                  "border-none bg-transparent rounded-none text-black rounded-t-md hover:bg-cgray-hover ",
+                  trace.id === activeTrace?.id &&
+                    "text-white bg-secondary hover:bg-secondary hover:text-white"
+                )}
+                onClick={() => setActiveTraceId(trace.id)}
+                variant="ghost"
+              >
+                {trace.label || `Trace ${idx + 1}`}
+              </Button>
+            ))}
             <Button
-              key={trace.id}
-              className={cn(
-                "border-none bg-transparent rounded-none text-black rounded-t-md hover:bg-cgray-hover ",
-                trace.id === activeTrace?.id &&
-                  "text-white bg-secondary hover:bg-secondary hover:text-white"
-              )}
-              onClick={() => setActiveTraceId(trace.id)}
               variant="ghost"
+              onClick={handleAddTrace}
+              className="hover:bg-cgray-hover rounded-none rounded-t-md p-2"
             >
-              {trace.label || `Trace ${idx + 1}`}
+              <PlusIcon />
             </Button>
-          ))}
-          <Button
-            variant="ghost"
-            onClick={handleAddTrace}
-            className="hover:bg-cgray-hover rounded-none rounded-t-md p-2"
-          >
-            <PlusIcon />
-          </Button>
-        </div>
-        <div className="p-4 space-y-2">
-          <Label htmlFor="traceTitle">Trace Label</Label>
-          <Input
-            name="traceTitle"
-            type="text"
-            value={activeTrace?.label}
-            onChange={(e) => handleUpdateTrace({ label: e.target.value })}
-            className="shadow-sm border-none rounded-sm"
-            placeholder="Enter trace label"
-          />
-          <ConfigurationSelect
-            label="Data key"
-            value={activeTrace?.selectedDataKey ?? ""}
-            onChange={setDataKey}
-            placeholder="Select data key"
-            name="dataKey"
-          >
-            {listItems}
-          </ConfigurationSelect>
-          <div className="flex w-full justify-between space-x-4">
-            <ConfigurationSelect
-              className="w-full"
-              value={activeTrace?.xAxisKey ?? ""}
-              onChange={setXAxisKey}
-              placeholder="Select X axis key"
-              label="X-Axis"
-              disabled={!activeTrace?.selectedDataKey}
-              name="xAxisKey"
-            >
-              {xAxisKeys.map((key: string) => (
-                <SelectItem key={key} value={key}>
-                  {key}
-                </SelectItem>
-              ))}
-            </ConfigurationSelect>
-            <ConfigurationSelect
-              className="w-full"
-              value={activeTrace?.yAxisKey ?? ""}
-              onChange={setYAxisKey}
-              placeholder="Select Y-axis key"
-              label="Y-Axis"
-              disabled={!activeTrace?.selectedDataKey}
-              name="yAxisKey"
-            >
-              {yAxisKeys.map((key: string) => (
-                <SelectItem key={key} value={key}>
-                  {key}
-                </SelectItem>
-              ))}
-            </ConfigurationSelect>
           </div>
-          <div className="space-y-1">
-            <Label htmlFor="chartType">Chart Type</Label>
-            <MultiSelect
-              className="shadow-sm"
-              styles={{
-                control: (baseStyles) => ({
-                  ...baseStyles,
-                  border: "none",
-                  borderRadius: "calc(var(--radius) - 4px)",
-                }),
-              }}
-              placeholder="Select chart type"
-              name="chartType"
-              isDisabled={!(activeTrace?.xAxisKey && activeTrace?.yAxisKey)}
-              isMulti={true}
-              options={chartTypeOptions}
-              value={activeTrace?.chartType ?? []}
-              onChange={setChartType}
+          <div className="px-4 space-y-2">
+            <Label htmlFor="traceTitle">Trace Label</Label>
+            <Input
+              name="traceTitle"
+              type="text"
+              value={activeTrace?.label}
+              onChange={(e) => handleUpdateTrace({ label: e.target.value })}
+              className="shadow-sm border-none rounded-sm"
+              placeholder="Enter trace label"
             />
-          </div>
-          <div className="flex space-x-4">
-          {
-            activeTrace?.chartType.some(option => option.value === 'bar') && (
-            <div className="flex items-center space-x-2">
-              <Label htmlFor="chartType">Bar Color</Label>
-              <div className="relative w-[30px] h-[30px] ">
-                <button
-                  className="rounded-sm h-full w-full"
-                  style={{ background: activeTrace?.color }}
-                  onClick={() => setColorPickerOpen(!colorPickerOpen)}
-                />
-                {colorPickerOpen && (
-                  <div className="absolute top-100 left-0">
-                    <TwitterPicker
-                      color={activeTrace?.color}
-                      onChange={(color) =>
-                        handleUpdateTrace({ color: color.hex })
+            <ConfigurationSelect
+              label="Data key"
+              value={activeTrace?.selectedDataKey ?? ""}
+              onChange={setDataKey}
+              placeholder="Select data key"
+              name="dataKey"
+            >
+              {listItems}
+            </ConfigurationSelect>
+            <div className="flex w-full justify-between space-x-4">
+              <ConfigurationSelect
+                className="w-full"
+                value={activeTrace?.xAxisKey ?? ""}
+                onChange={setXAxisKey}
+                placeholder="Select X axis key"
+                label="X-Axis"
+                disabled={!activeTrace?.selectedDataKey}
+                name="xAxisKey"
+              >
+                {xAxisKeys.map((key: string) => (
+                  <SelectItem key={key} value={key}>
+                    {key}
+                  </SelectItem>
+                ))}
+              </ConfigurationSelect>
+              <ConfigurationSelect
+                className="w-full"
+                value={activeTrace?.yAxisKey ?? ""}
+                onChange={setYAxisKey}
+                placeholder="Select Y-axis key"
+                label="Y-Axis"
+                disabled={!activeTrace?.selectedDataKey}
+                name="yAxisKey"
+              >
+                {yAxisKeys.map((key: string) => (
+                  <SelectItem key={key} value={key}>
+                    {key}
+                  </SelectItem>
+                ))}
+              </ConfigurationSelect>
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="chartType">Chart Type</Label>
+              <MultiSelect
+                className="shadow-sm"
+                styles={{
+                  control: (baseStyles) => ({
+                    ...baseStyles,
+                    border: "none",
+                    borderRadius: "calc(var(--radius) - 4px)",
+                  }),
+                }}
+                placeholder="Select chart type"
+                name="chartType"
+                isDisabled={!(activeTrace?.xAxisKey && activeTrace?.yAxisKey)}
+                isMulti={true}
+                options={chartTypeOptions}
+                value={activeTrace?.chartType ?? []}
+                onChange={setChartType}
+              />
+            </div>
+            <div className="flex space-x-4">
+              {activeTrace?.chartType.some(
+                (option) => option.value === "bar"
+              ) && (
+                <div className="flex items-center space-x-2">
+                  <Label htmlFor="chartType">Bar Color</Label>
+                  <div className="relative w-[30px] h-[30px] ">
+                    <button
+                      className="rounded-sm h-full w-full"
+                      style={{ background: activeTrace?.color }}
+                      onClick={() => setColorPickerOpen(!colorPickerOpen)}
+                    />
+                    {colorPickerOpen && (
+                      <div className="absolute top-100 left-0">
+                        <TwitterPicker
+                          color={activeTrace?.color}
+                          onChange={(color) =>
+                            handleUpdateTrace({ color: color.hex })
+                          }
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {activeTrace?.chartType.some(
+                (option) => option.value === "line"
+              ) && (
+                <div className="flex items-center space-x-2">
+                  <Label htmlFor="chartType">Line Color</Label>
+                  <div className="relative w-[30px] h-[30px] ">
+                    <button
+                      className="rounded-sm h-full w-full"
+                      style={{ background: activeTrace?.lineColor }}
+                      onClick={() =>
+                        setLineColorPickerOpen(!lineColorPickerOpen)
                       }
                     />
+                    {lineColorPickerOpen && (
+                      <div className="absolute top-100 left-0">
+                        <TwitterPicker
+                          color={activeTrace?.lineColor}
+                          onChange={(color) =>
+                            handleUpdateTrace({ lineColor: color.hex })
+                          }
+                        />
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
-            )
-                    }
-
-          {
-            activeTrace?.chartType.some(option => option.value === 'line') && (
-            <div className="flex items-center space-x-2">
-              <Label htmlFor="chartType">Line Color</Label>
-              <div className="relative w-[30px] h-[30px] ">
-                <button
-                  className="rounded-sm h-full w-full"
-                  style={{ background: activeTrace?.lineColor }}
-                  onClick={() => setLineColorPickerOpen(!lineColorPickerOpen)}
-                />
-                {lineColorPickerOpen && (
-                  <div className="absolute top-100 left-0">
-                    <TwitterPicker
-                      color={activeTrace?.lineColor}
-                      onChange={(color) =>
-                        handleUpdateTrace({ lineColor: color.hex })
-                      }
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-              )
-            }
-
-
           </div>
         </div>
       </div>
-      <div className="flex grow flex-col justify-center min-h-screen">
-        <BasicChart data={activeChartData} />
+      <div className="flex grow flex-col justify-center h-screen">
+        <Canvas
+          activeNodeIdx={activeChartIdx}
+          chartIds={charts.map((chart) => chart.id)}
+        >
+          {charts.map((chart) => {
+            return <BasicChart chartId={chart.id} key={"chart-" + chart.id} />;
+          })}
+        </Canvas>
       </div>
     </div>
   );
 };
 
-export default ConfigurationDialog;
+export default ChartConfiguration;
 
 interface Data2D {
   xValues: (number | string)[];
