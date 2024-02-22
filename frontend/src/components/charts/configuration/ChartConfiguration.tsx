@@ -66,6 +66,7 @@ const ChartConfiguration = () => {
     handleAddTrace,
     handleUpdateTrace,
     setActiveTraceId,
+    handleUpdateChart,
     handleDeleteTrace,
   } = useChartsContext();
   const dataKeys = findArrayPaths(data);
@@ -208,6 +209,37 @@ const ChartConfiguration = () => {
                   </SelectItem>
                 ))}
               </ConfigurationSelect>
+            </div>
+
+            <div className="flex w-full justify-between space-x-4">
+              <div className="flex-1">
+                <Input
+                  id="XAxisLabel"
+                  type="text"
+                  className="shadow-sm border-none rounded-sm w-full"
+                  value={activeChart?.xAxisLabel ?? ""}
+                  onChange={(e) =>
+                    handleUpdateChart({
+                      xAxisLabel: e.target.value,
+                    })
+                  }
+                  placeholder="Enter X-axis label"
+                />
+              </div>
+              <div className="flex-1">
+                <Input
+                  id="YAxisLabel"
+                  type="text"
+                  className="shadow-sm border-none rounded-sm w-full"
+                  value={activeChart?.yAxisLabel ?? ""}
+                  onChange={(e) =>
+                    handleUpdateChart({
+                      yAxisLabel: e.target.value,
+                    })
+                  }
+                  placeholder="Enter Y-axis label"
+                />
+              </div>
             </div>
             <div className="space-y-1">
               <Label htmlFor="chartType">Chart Type</Label>
