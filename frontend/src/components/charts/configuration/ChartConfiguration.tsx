@@ -344,16 +344,23 @@ function determineValidChartTypes(data: Data2D): ChartType[] {
 
   const validChartTypes: ChartType[] = [];
 
-  // Check for valid chart types based on data patterns
+  // this prevents the issue of having a line chart with a line going backwards and forwards
+  const hasUniqueXValues = new Set(data.xValues).size === data.xValues.length;
+
+  if (isXNumeric && isYNumeric && hasUniqueXValues) {
+    validChartTypes.push("line");
+  }
+
   if (isXNumeric && isYNumeric) {
-    validChartTypes.push("scatter", "bar", "line");
+    validChartTypes.push("scatter", "bar");
   }
 
   if (isXString && isYNumeric) {
-    validChartTypes.push("bar", "pie", "scatter", "line");
+    validChartTypes.push("bar", "pie", "scatter");
+    if (hasUniqueXValues) {
+      validChartTypes.push("line");
+    }
   }
-
-  // Add more checks based on your specific data patterns and chart types
 
   return Array.from(new Set(validChartTypes).values());
 }
