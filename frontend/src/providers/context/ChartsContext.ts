@@ -32,6 +32,7 @@ const defaultContext = {
   handleUpdateChart: () => { },
   handleDeleteChart: () => { },
   handleUpdateTrace: () => { },
+  handleDeleteTrace: () => { },
   setActiveChartId: () => { },
   setActiveTraceId: () => { },
   setChartThumb: () => { },
@@ -43,6 +44,7 @@ export type ChartTypeOption = { value: ChartType; label: string };
 export type Chart = typeof defaultChart;
 export type Charts = Chart[];
 export type Trace = Chart["traces"][0];
+
 
 export interface IChartsContext {
   charts: Charts;
@@ -57,6 +59,7 @@ export interface IChartsContext {
   handleUpdateChart: (value: Partial<Chart>, id?: string) => void;
   handleDeleteChart: (id: string) => void;
   handleUpdateTrace: (value: Partial<Trace>) => void;
+  handleDeleteTrace: (id: string, chartId: string) => void;
   setActiveChartId: (id: string) => void;
   setActiveTraceId: (id: string) => void;
   setChartThumb: (id: string, thumb: string) => void;

@@ -13,8 +13,8 @@ import ReactFlow, {
 
 import "reactflow/dist/style.css";
 import { ChartNode, ChartNodeData } from "./ChartNode";
-import { defaultChartHeight } from "../charts/BasicChart";
 import { InvisibleNode } from "./InvisibleNode";
+import { defaultChartWidth } from "../consts";
 
 interface CanvasProps {
   activeChartId?: string;
@@ -132,6 +132,20 @@ const borderEdges: Edge[] = [
   },
 ];
 
+function getXYDefaultPlacement(index: number) {
+  const maxChartsPerColumn = Math.floor(
+    (nodeExtent[1][1] - nodeExtent[0][1]) / defaultChartWidth
+  );
+  if (index >= maxChartsPerColumn) {
+    return {
+      x: nodeExtent[1][0] - defaultChartWidth - innerMargin,
+      y: (index % maxChartsPerColumn) * (defaultChartWidth + 70),
+    };
+  } else {
+    return { x: 0, y: index * (defaultChartWidth + 70) };
+  }
+}
+
 export default function Canvas({ activeChartId, chartIds }: CanvasProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState<
     ChartNodeData | { style: CSSProperties }
@@ -145,7 +159,7 @@ export default function Canvas({ activeChartId, chartIds }: CanvasProps) {
     const newNodes = chartIds.map((id, index) => ({
       id,
       type: "chart",
-      position: { x: 0, y: index * defaultChartHeight * 1.5 }, // TODO: calculate position in a better way
+      position: getXYDefaultPlacement(index), // TODO: calculate position in a better way
       data: {
         chartId: id,
       },

@@ -1,1 +1,1 @@
-export const defaultChartWidth = 500
+export const defaultChartWidth = 350

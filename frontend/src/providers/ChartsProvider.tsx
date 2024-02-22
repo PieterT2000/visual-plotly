@@ -69,10 +69,12 @@ const ChartsProvider = ({ children, files }: ChartsProviderProps) => {
     [charts, activeChartId]
   );
 
-  const activeTrace = useMemo(
-    () => activeChart?.traces.find((trace) => trace.id === activeTraceId),
-    [activeChart?.traces, activeTraceId]
-  );
+  // console.log("activechart", activeChart?.traces);
+  const activeTrace = useMemo(() => {
+    console.log(typeof activeTraceId, activeTraceId);
+    return activeChart?.traces.find((trace) => trace.id === activeTraceId);
+  }, [activeChart?.traces, activeTraceId]);
+  console.log("activeTraceId", activeTraceId);
 
   useEffect(() => {
     if (files.length === 0) return;
@@ -130,7 +132,7 @@ const ChartsProvider = ({ children, files }: ChartsProviderProps) => {
 
       if (updatedCharts.length === 0) {
         handleAddChart();
-      } else if (id === activeChartId) {
+      } else {
         // If the active chart is deleted, set the first chart as active
         setActiveChartId(updatedCharts[0].id);
         setActiveTraceId(updatedCharts[0].traces[0].id);
@@ -168,6 +170,28 @@ const ChartsProvider = ({ children, files }: ChartsProviderProps) => {
     [activeChart?.traces, activeTraceId, handleUpdateChart]
   );
 
+  const handleDeleteTrace = useCallback(
+    (traceId: string, chartId: string) => {
+      if (activeChart) {
+        const updatedTraces = activeChart.traces.filter(
+          (trace) => trace.id !== traceId
+        );
+        console.log("updatedTraces #1", updatedTraces);
+        handleUpdateChart({ traces: updatedTraces }, chartId);
+
+        if (updatedTraces.length === 0) {
+          // reset last remaining trace tab to empty values
+          handleUpdateChart({ traces: [{ ...emptyTrace }] }, chartId);
+        } else {
+          setActiveTraceId(updatedTraces[0].id);
+          console.log("updatedTraces #2", updatedTraces);
+          console.log("new updated Trace", updatedTraces[0].id);
+        }
+      }
+    },
+    [activeChart?.traces, activeTraceId, handleUpdateChart]
+  );
+
   const contextValue = useMemo(
     () => ({
       charts,
@@ -180,6 +204,7 @@ const ChartsProvider = ({ children, files }: ChartsProviderProps) => {
       handleUpdateChart,
       handleDeleteChart,
       handleUpdateTrace,
+      handleDeleteTrace,
       setActiveChartId,
       setActiveTraceId,
       setChartThumb,
@@ -195,6 +220,7 @@ const ChartsProvider = ({ children, files }: ChartsProviderProps) => {
       handleUpdateChart,
       handleDeleteChart,
       handleUpdateTrace,
+      handleDeleteTrace,
       setChartThumb,
     ]
   );

@@ -10,7 +10,6 @@ import {
 } from "src/providers/context/ChartsContext";
 import { useChartImageCapture } from "src/hooks/useChartImageCapture";
 import get from "lodash.get";
-import { defaultChartWidth } from "../consts";
 
 // Use custom Plotly build
 const Plot = createPlotlyComponent(Plotly) as React.ComponentClass<PlotParams>;
@@ -90,13 +89,8 @@ const plotDataSelectors: Record<ChartType, PlotDataSelector> = {
   },
 };
 
-export const defaultChartHeight = 400;
-
 const BasicChart = forwardRef(
-  (
-    { chartId, width = defaultChartWidth }: BasicChartProps,
-    ref: React.Ref<any>
-  ) => {
+  ({ chartId, width }: BasicChartProps, ref: React.Ref<any>) => {
     const localRef = useRef(null);
     const chartRef = ref || localRef;
     // chartsData

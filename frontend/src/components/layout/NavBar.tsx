@@ -45,7 +45,9 @@ const NavBar = () => {
               alt={chart.name}
             />
             <div className="chart_thumb-overlay absolute top-0 left-0 w-full h-full rounded-apple opacity-0 hover:opacity-100 flex items-center justify-center">
-              <span className="z-[999] text-white truncate">{chart.name}</span>
+              <span className="z-[999] text-white truncate px-1">
+                {chart.name}
+              </span>
             </div>
             <div
               className="chart_thumb-delete"

@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
+import { MouseEvent, useMemo, useState } from "react";
 import { SelectGroup, SelectItem, SelectLabel } from "components/ui/select";
 import get from "lodash.get";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, X } from "lucide-react";
 import MultiSelect, { MultiValue } from "react-select";
 import ConfigurationSelect from "./ConfigurationSelect";
 import { Button } from "src/components/ui/button";
@@ -66,6 +66,7 @@ const ChartConfiguration = () => {
     handleAddTrace,
     handleUpdateTrace,
     setActiveTraceId,
+    handleDeleteTrace,
   } = useChartsContext();
   const dataKeys = findArrayPaths(data);
   const grouped = groupKeysToObject(dataKeys);
@@ -110,25 +111,43 @@ const ChartConfiguration = () => {
     return [xAxisKeys, yAxisKeys, chartTypeOptions];
   }, [activeTrace, data]);
 
+  const onDeleteTrace = (evt: MouseEvent, traceId: string, chartId: string) => {
+    evt.stopPropagation();
+    handleDeleteTrace(traceId, chartId);
+  };
+
   return (
     <div className="flex items-center h-full">
       <div className="py-8 space-y-8 w-[400px] lg:w-[500px] bg-cgray h-full flex flex-col">
         <ChartConfigFields />
         <div className="px-2">
           <TypographyH3 className="mb-6">Traces Options</TypographyH3>
-          <div className="border-secondary border-b flex mx-2 mb-4">
+          <div className="border-secondary border-b flex mx-2 mb-4 overflow-auto">
             {activeChart?.traces.map((trace, idx) => (
               <Button
                 key={trace.id}
                 className={cn(
-                  "border-none bg-transparent rounded-none text-black rounded-t-md hover:bg-cgray-hover ",
+                  "relative px-2 w-[90px] justify-between border-none bg-transparent rounded-none text-black rounded-t-md hover:bg-cgray-hover ",
                   trace.id === activeTrace?.id &&
                     "text-white bg-secondary hover:bg-secondary hover:text-white"
                 )}
                 onClick={() => setActiveTraceId(trace.id)}
                 variant="ghost"
               >
-                {trace.label || `Trace ${idx + 1}`}
+                <span className={cn("truncate")}>
+                  {trace.label || `Trace ${idx + 1}`}
+                </span>
+
+                {trace.id === activeTrace?.id && (
+                  <div
+                    onClick={(evt) =>
+                      onDeleteTrace(evt, trace.id, activeChart!.id)
+                    }
+                    className="pl-2"
+                  >
+                    <X size={18} />
+                  </div>
+                )}
               </Button>
             ))}
             <Button

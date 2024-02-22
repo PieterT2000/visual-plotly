@@ -1,4 +1,4 @@
-import { memo, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { NodeProps, NodeResizer, ResizeParams } from "reactflow";
 import { TypographyH3, TypographyP } from "../ui";
 import { useChartsContext } from "src/providers/context/ChartsContext";
@@ -10,7 +10,7 @@ export interface ChartNodeData {
   chartId: string;
 }
 
-export const ChartNode = memo(({ data }: NodeProps<ChartNodeData>) => {
+export const ChartNode = ({ data }: NodeProps<ChartNodeData>) => {
   const [width, setWidth] = useState(defaultChartWidth);
   const { charts } = useChartsContext();
   const chart = useMemo(
@@ -47,4 +47,4 @@ export const ChartNode = memo(({ data }: NodeProps<ChartNodeData>) => {
       </div>
     </div>
   );
-});
+};
