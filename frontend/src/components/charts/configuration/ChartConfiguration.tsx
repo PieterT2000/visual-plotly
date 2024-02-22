@@ -18,6 +18,7 @@ import { TwitterPicker } from "react-color";
 import Canvas from "src/components/canvas/Canvas";
 import ChartConfigFields from "./ChartConfigFields";
 import { TypographyH3 } from "src/components/ui";
+import { defaultChartWidth } from "src/components/consts";
 
 function renderDataKeyList(
   value: GroupedObject | string | string[],
@@ -277,7 +278,13 @@ const ChartConfiguration = () => {
           chartIds={charts.map((chart) => chart.id)}
         >
           {charts.map((chart) => {
-            return <BasicChart chartId={chart.id} key={"chart-" + chart.id} />;
+            return (
+              <BasicChart
+                chartId={chart.id}
+                key={"chart-" + chart.id}
+                width={defaultChartWidth}
+              />
+            );
           })}
         </Canvas>
       </div>

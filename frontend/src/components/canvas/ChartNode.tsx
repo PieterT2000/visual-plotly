@@ -1,37 +1,54 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { NodeProps } from "reactflow";
+import React, { memo, useMemo, useRef, useState } from "react";
+import { NodeProps, NodeResizer, ResizeParams } from "reactflow";
 import { TypographyH3, TypographyP } from "../ui";
 import { useChartsContext } from "src/providers/context/ChartsContext";
+import { innerMargin, nodeExtent } from "./Canvas";
+import { defaultChartWidth } from "../consts";
 
 export interface ChartNodeData {
   children: React.ReactNode;
   chartId: string;
 }
 
-export const ChartNode = ({ data }: NodeProps<ChartNodeData>) => {
-  const [width, setWidth] = useState();
+export const ChartNode = memo(({ data }: NodeProps<ChartNodeData>) => {
+  const [width, setWidth] = useState(defaultChartWidth);
   const { charts } = useChartsContext();
   const chart = useMemo(
     () => charts.find((chart) => chart.id === data.chartId),
     [charts, data.chartId]
   );
-  console.log(data.chartId);
   const chartRef = useRef(null);
 
-  useEffect(() => {
+  // @ts-ignore
+  const handleResize = (_, { width }: ResizeParams) => {
     if (!chartRef.current) return;
-    setWidth((chartRef.current as any).props.style.width);
-  }, [chartRef.current]);
+    const paddingAdjustedWidth = width - 16; // see p-2 class on chart wrapper below
+    setWidth(paddingAdjustedWidth);
+  };
 
   return (
-    <div className="bg-white">
-      <div style={{ maxWidth: width }}>
+    <div style={{ width: width + 16 }}>
+      <div>
         <TypographyH3>{chart?.title}</TypographyH3>
         <TypographyP className="w-full">{chart?.description}</TypographyP>
       </div>
-      {React.cloneElement(data.children as React.ReactElement, {
-        ref: chartRef,
-      })}
+      <div className="relative p-2">
+        {width !== undefined && (
+          <NodeResizer
+            minWidth={300}
+            maxWidth={nodeExtent[1][0] - innerMargin}
+            onResize={handleResize}
+            keepAspectRatio
+          />
+        )}
+        <div className="bg-white">
+          {/* Chart component is rendered here */}
+          {React.cloneElement(data.children as React.ReactElement, {
+            ref: chartRef,
+            width,
+          })}
+        </div>
+      </div>
     </div>
   );
-};
+});

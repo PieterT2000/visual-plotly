@@ -10,12 +10,14 @@ import {
 } from "src/providers/context/ChartsContext";
 import { useChartImageCapture } from "src/hooks/useChartImageCapture";
 import get from "lodash.get";
+import { defaultChartWidth } from "../consts";
 
 // Use custom Plotly build
 const Plot = createPlotlyComponent(Plotly) as React.ComponentClass<PlotParams>;
 
-interface BasicChartProps {
+export interface BasicChartProps {
   chartId: string;
+  width: number;
 }
 
 type DataToBePlotted = { [key: string]: number | string }[];
@@ -90,73 +92,78 @@ const plotDataSelectors: Record<ChartType, PlotDataSelector> = {
 
 export const defaultChartHeight = 400;
 
-const BasicChart = forwardRef((props: BasicChartProps, ref: React.Ref<any>) => {
-  const localRef = useRef(null);
-  const chartRef = ref || localRef;
-  // chartsData
-  const { charts, data: chartsData } = useChartsContext();
+const BasicChart = forwardRef(
+  (
+    { chartId, width = defaultChartWidth }: BasicChartProps,
+    ref: React.Ref<any>
+  ) => {
+    const localRef = useRef(null);
+    const chartRef = ref || localRef;
+    // chartsData
+    const { charts, data: chartsData } = useChartsContext();
 
-  const chartConfig = useMemo(() => {
-    return charts.find((chart) => chart.id === props.chartId);
-  }, [props.chartId, charts]);
+    const chartConfig = useMemo(() => {
+      return charts.find((chart) => chart.id === chartId);
+    }, [chartId, charts]);
 
-  // Data are the values to be plotted
-  const data = useMemo(() => {
+    // Data are the values to be plotted
+    const data = useMemo(() => {
+      return (
+        chartConfig?.traces.map((trace) =>
+          get(chartsData, trace.selectedDataKey, [])
+        ) ?? []
+      );
+    }, [chartConfig, chartsData]);
+
+    const plotData = useMemo(() => {
+      if (!chartConfig) return [];
+      return chartConfig.traces.reduce(
+        (acc: ReturnType<PlotDataSelector>[], traceConfig, idx) => {
+          const { chartType } = traceConfig;
+          if (chartType.length === 0 || data.length === 0) return acc;
+          const plotData = plotDataSelectors[chartType[0].value](
+            data[idx],
+            traceConfig
+          );
+          acc.push(plotData);
+          return acc;
+        },
+        []
+      );
+    }, [data, chartConfig]);
+
+    useChartImageCapture(plotData, chartId);
+
+    const dimensions = useMemo(() => {
+      // @ts-ignore
+      const aspect = plotData[0]?.aspect ?? 4 / 3;
+      return {
+        width: Math.round(width),
+        height: Math.round(width / aspect),
+      };
+    }, [width]);
+
+    const filteredPlotData = useMemo(
+      () => plotData.filter((data) => removeObjectKeys(data, ["extra"])),
+      [plotData]
+    );
+
     return (
-      chartConfig?.traces.map((trace) =>
-        get(chartsData, trace.selectedDataKey, [])
-      ) ?? []
+      <Plot
+        ref={chartRef}
+        useResizeHandler
+        style={dimensions}
+        data={filteredPlotData}
+        layout={{
+          autosize: true,
+          title: chartConfig?.name,
+          xaxis: { title: chartConfig?.xAxisLabel },
+          yaxis: { title: chartConfig?.yAxisLabel },
+        }}
+      />
     );
-  }, [chartConfig, chartsData]);
-
-  const plotData = useMemo(() => {
-    if (!chartConfig) return [];
-    return chartConfig.traces.reduce(
-      (acc: ReturnType<PlotDataSelector>[], traceConfig, idx) => {
-        const { chartType } = traceConfig;
-        if (chartType.length === 0 || data.length === 0) return acc;
-        const plotData = plotDataSelectors[chartType[0].value](
-          data[idx],
-          traceConfig
-        );
-        acc.push(plotData);
-        return acc;
-      },
-      []
-    );
-  }, [data, chartConfig]);
-
-  useChartImageCapture(plotData, props.chartId);
-
-  const dimensions = useMemo(() => {
-    // @ts-ignore
-    const aspect = plotData[0]?.aspect ?? 4 / 3;
-    return {
-      width: Math.round(aspect * defaultChartHeight),
-      height: defaultChartHeight,
-    };
-  }, [plotData]);
-
-  const filteredPlotData = useMemo(
-    () => plotData.filter((data) => removeObjectKeys(data, ["extra"])),
-    [plotData]
-  );
-
-  return (
-    <Plot
-      ref={chartRef}
-      useResizeHandler
-      style={dimensions}
-      data={filteredPlotData}
-      layout={{
-        autosize: true,
-        title: chartConfig?.name,
-        xaxis: { title: chartConfig?.xAxisLabel },
-        yaxis: { title: chartConfig?.yAxisLabel },
-      }}
-    />
-  );
-});
+  }
+);
 
 export default BasicChart;
 
