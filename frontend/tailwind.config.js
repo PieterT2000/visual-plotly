@@ -18,6 +18,8 @@ module.exports = {
     extend: {
       colors: {
         border: "hsl(var(--border))",
+        appleBorder: "var(--border-apple)",
+        appleFill: "var(--fill-apple)",
         input: "hsl(var(--input))",
         ring: "var(--ring)",
         background: "hsl(var(--background))",
@@ -55,10 +57,14 @@ module.exports = {
           hover: "#eaeaea",
         },
       },
+      boxShadow: {
+        apple: "var(--shadow-apple)",
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        apple: "var(--radius-apple)",
       },
       keyframes: {
         "accordion-down": {

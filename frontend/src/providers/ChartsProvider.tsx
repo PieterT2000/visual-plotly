@@ -91,8 +91,8 @@ const ChartsProvider = ({ children, files }: ChartsProviderProps) => {
   const handleAddChart = useCallback(() => {
     const newChartId = nanoid();
     const newTraceId = nanoid();
-    setCharts([
-      ...charts,
+    setCharts((prevCharts) => [
+      ...prevCharts,
       {
         ...emptyChart,
         id: newChartId,
@@ -119,6 +119,22 @@ const ChartsProvider = ({ children, files }: ChartsProviderProps) => {
         return chart;
       });
       setCharts(updatedCharts);
+    },
+    [charts, activeChartId]
+  );
+
+  const handleDeleteChart = useCallback(
+    (id: string) => {
+      const updatedCharts = charts.filter((chart) => chart.id !== id);
+      setCharts(updatedCharts);
+
+      if (updatedCharts.length === 0) {
+        handleAddChart();
+      } else if (id === activeChartId) {
+        // If the active chart is deleted, set the first chart as active
+        setActiveChartId(updatedCharts[0].id);
+        setActiveTraceId(updatedCharts[0].traces[0].id);
+      }
     },
     [charts, activeChartId]
   );
@@ -162,6 +178,7 @@ const ChartsProvider = ({ children, files }: ChartsProviderProps) => {
       handleAddChart,
       handleAddTrace,
       handleUpdateChart,
+      handleDeleteChart,
       handleUpdateTrace,
       setActiveChartId,
       setActiveTraceId,
@@ -176,6 +193,7 @@ const ChartsProvider = ({ children, files }: ChartsProviderProps) => {
       handleAddChart,
       handleAddTrace,
       handleUpdateChart,
+      handleDeleteChart,
       handleUpdateTrace,
       setChartThumb,
     ]

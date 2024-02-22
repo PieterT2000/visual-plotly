@@ -1,4 +1,4 @@
-import React, { useEffect, Children, useRef, CSSProperties } from "react";
+import { useEffect, useRef, CSSProperties } from "react";
 import ReactFlow, {
   useNodesState,
   Controls,
@@ -17,9 +17,7 @@ import { defaultChartHeight } from "../charts/BasicChart";
 import { InvisibleNode } from "./InvisibleNode";
 
 interface CanvasProps {
-  /** All passed children as assumed to be chart components  */
-  children: React.ReactNode;
-  activeNodeIdx: number;
+  activeChartId?: string;
   /** Should be passed in same order as children */
   chartIds: string[];
 }
@@ -134,11 +132,7 @@ const borderEdges: Edge[] = [
   },
 ];
 
-export default function Canvas({
-  children = [],
-  activeNodeIdx,
-  chartIds,
-}: CanvasProps) {
+export default function Canvas({ activeChartId, chartIds }: CanvasProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState<
     ChartNodeData | { style: CSSProperties }
   >(initialNodes);
@@ -146,59 +140,36 @@ export default function Canvas({
   const flowInstance = useRef<ReactFlowInstance>();
 
   useEffect(() => {
-    if (!children) return;
-    const childrenArr = Children.toArray(children);
-    if (chartIds.length !== childrenArr.length) {
-      console.error("chartIds and children length mismatch");
-      return;
-    }
+    if (!chartIds) return;
 
-    // find nodes not yet added
-    const addedNodesIds = nodes.map((node) => node.id);
-    const notAddedChildrenIndices = childrenArr
-      .map((_, index) => {
-        if (!addedNodesIds.includes(chartIds[index])) {
-          return index;
-        }
-        return null;
-      })
-      .filter((index) => index !== null) as number[];
+    const newNodes = chartIds.map((id, index) => ({
+      id,
+      type: "chart",
+      position: { x: 0, y: index * defaultChartHeight * 1.5 }, // TODO: calculate position in a better way
+      data: {
+        chartId: id,
+      },
+    }));
 
-    if (notAddedChildrenIndices.length == 0) return;
-
-    const newNodes = [...nodes];
-
-    notAddedChildrenIndices.forEach((index) => {
-      const newNode = {
-        id: chartIds[index],
-        type: "chart",
-        position: { x: 0, y: index * defaultChartHeight * 1.5 }, // TODO: calculate position in a better way
-        data: {
-          children: childrenArr[index] as React.ReactNode,
-          chartId: chartIds[index],
-        },
-      };
-      newNodes.splice(index, 0, newNode);
-    });
-
-    setNodes(newNodes);
-  }, [children]);
+    setNodes([...initialNodes, ...newNodes]);
+  }, [chartIds]);
 
   useEffect(() => {
-    if (activeNodeIdx === -1 || !flowInstance.current) return;
-    const node = nodes[activeNodeIdx];
+    if (!activeChartId || !flowInstance.current) return;
+    const node = nodes.find((node) => node.id === activeChartId);
     if (!node) return;
     // Hack: when a new node is added in state, it's not yet in the DOM, so we need to wait a bit until its width/height parameters are set
     setTimeout(() => {
       setNodes((prevNodes) => {
         if (!flowInstance.current) return prevNodes;
-        const node = prevNodes[activeNodeIdx];
+        const node = prevNodes.find((node) => node.id === activeChartId);
+        if (!node) return prevNodes;
         flowInstance.current.fitView({ nodes: [node], duration: 500 });
 
         return prevNodes;
       });
     }, 50);
-  }, [activeNodeIdx, nodes.length, flowInstance.current]);
+  }, [activeChartId, nodes.length, flowInstance.current]);
 
   return (
     <div className="h-full">

@@ -159,6 +159,8 @@ const BasicChart = forwardRef(
           title: chartConfig?.name,
           xaxis: { title: chartConfig?.xAxisLabel },
           yaxis: { title: chartConfig?.yAxisLabel },
+          paper_bgcolor: "rgba(0,0,0,0)",
+          plot_bgcolor: "rgba(0,0,0,0)",
         }}
       />
     );

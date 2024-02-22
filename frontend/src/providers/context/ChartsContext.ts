@@ -30,6 +30,7 @@ const defaultContext = {
   handleAddChart: () => { },
   handleAddTrace: () => { },
   handleUpdateChart: () => { },
+  handleDeleteChart: () => { },
   handleUpdateTrace: () => { },
   setActiveChartId: () => { },
   setActiveTraceId: () => { },
@@ -54,6 +55,7 @@ export interface IChartsContext {
   handleAddChart: () => void;
   handleAddTrace: () => void;
   handleUpdateChart: (value: Partial<Chart>, id?: string) => void;
+  handleDeleteChart: (id: string) => void;
   handleUpdateTrace: (value: Partial<Trace>) => void;
   setActiveChartId: (id: string) => void;
   setActiveTraceId: (id: string) => void;

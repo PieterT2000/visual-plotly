@@ -8,7 +8,6 @@ import { Button } from "src/components/ui/button";
 import { capitalize, cn } from "src/utils";
 import { Input } from "src/components/ui/input";
 import { Label } from "components/ui/label";
-import BasicChart from "../BasicChart";
 import {
   useChartsContext,
   ChartType,
@@ -18,7 +17,6 @@ import { TwitterPicker } from "react-color";
 import Canvas from "src/components/canvas/Canvas";
 import ChartConfigFields from "./ChartConfigFields";
 import { TypographyH3 } from "src/components/ui";
-import { defaultChartWidth } from "src/components/consts";
 
 function renderDataKeyList(
   value: GroupedObject | string | string[],
@@ -112,13 +110,9 @@ const ChartConfiguration = () => {
     return [xAxisKeys, yAxisKeys, chartTypeOptions];
   }, [activeTrace, data]);
 
-  const activeChartIdx = charts.findIndex(
-    (chart) => chart.id === activeChart?.id
-  );
-
   return (
     <div className="flex items-center h-full">
-      <div className="space-y-8 w-[400px] lg:w-[500px] bg-cgray h-full flex flex-col justify-center">
+      <div className="py-8 space-y-8 w-[400px] lg:w-[500px] bg-cgray h-full flex flex-col">
         <ChartConfigFields />
         <div className="px-2">
           <TypographyH3 className="mb-6">Traces Options</TypographyH3>
@@ -274,19 +268,9 @@ const ChartConfiguration = () => {
       </div>
       <div className="flex grow flex-col justify-center h-screen">
         <Canvas
-          activeNodeIdx={activeChartIdx}
+          activeChartId={activeChart?.id}
           chartIds={charts.map((chart) => chart.id)}
-        >
-          {charts.map((chart) => {
-            return (
-              <BasicChart
-                chartId={chart.id}
-                key={"chart-" + chart.id}
-                width={defaultChartWidth}
-              />
-            );
-          })}
-        </Canvas>
+        />
       </div>
     </div>
   );

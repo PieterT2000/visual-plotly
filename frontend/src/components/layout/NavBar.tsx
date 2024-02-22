@@ -1,7 +1,8 @@
-import { Plus } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { Chart, useChartsContext } from "src/providers/context/ChartsContext";
 import { cn } from "src/utils";
 import { Button } from "../ui/button";
+import { MouseEvent } from "react";
 
 const NavBar = () => {
   const {
@@ -11,13 +12,19 @@ const NavBar = () => {
     setActiveChartId,
     handleAddChart,
     setActiveTraceId,
+    handleDeleteChart,
   } = useChartsContext();
 
-  const handleSelectChart = (chart: Chart) => {
+  const onSelectChart = (chart: Chart) => {
     const chartId = chart.id;
     if (activeChart?.id === chartId) return;
     setActiveChartId(chartId);
     setActiveTraceId(chart.traces[0].id);
+  };
+
+  const onDeleteChart = (chart: Chart, evt: MouseEvent) => {
+    evt.stopPropagation();
+    handleDeleteChart(chart.id);
   };
 
   return (
@@ -26,26 +33,32 @@ const NavBar = () => {
         {charts.map((chart) => (
           <button
             key={chart.id}
-            className="relative cursor-pointer rounded-full shadow-lg"
-            onClick={() => handleSelectChart(chart)}
+            className="chart_thumb-container relative cursor-pointer rounded-apple shadow-apple"
+            onClick={() => onSelectChart(chart)}
           >
             <img
               className={cn(
-                "rounded-full h-[80px] w-[80px] overflow-hidden",
-                chart.id === activeChart?.id && "ring-2 ring-secondary"
+                "rounded-apple h-[75px] w-[75px] overflow-hidden bg-appleFill border-2",
+                chart.id === activeChart?.id && "border-2 border-appleBorder"
               )}
               src={chartThumbs[chart.id]}
               alt={chart.name}
             />
-            <div className="absolute top-0 left-0 w-full h-full bg-black rounded-full opacity-0 hover:opacity-50 transition-opacity flex items-center justify-center">
+            <div className="chart_thumb-overlay absolute top-0 left-0 w-full h-full rounded-apple opacity-0 hover:opacity-100 flex items-center justify-center">
               <span className="z-[999] text-white truncate">{chart.name}</span>
+            </div>
+            <div
+              className="chart_thumb-delete"
+              onClick={(evt) => onDeleteChart(chart, evt)}
+            >
+              <X size={"15px"} />
             </div>
           </button>
         ))}
 
         <Button
           variant="ghost"
-          className="hover:bg-cgray-hover rounded-md p-2"
+          className="hover:bg-cgray-hover rounded-apple p-2"
           onClick={handleAddChart}
         >
           <Plus />

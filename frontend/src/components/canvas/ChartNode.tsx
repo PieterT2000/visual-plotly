@@ -1,12 +1,12 @@
-import React, { memo, useMemo, useRef, useState } from "react";
+import { memo, useMemo, useRef, useState } from "react";
 import { NodeProps, NodeResizer, ResizeParams } from "reactflow";
 import { TypographyH3, TypographyP } from "../ui";
 import { useChartsContext } from "src/providers/context/ChartsContext";
 import { innerMargin, nodeExtent } from "./Canvas";
 import { defaultChartWidth } from "../consts";
+import BasicChart from "../charts/BasicChart";
 
 export interface ChartNodeData {
-  children: React.ReactNode;
   chartId: string;
 }
 
@@ -41,12 +41,8 @@ export const ChartNode = memo(({ data }: NodeProps<ChartNodeData>) => {
             keepAspectRatio
           />
         )}
-        <div className="bg-white">
-          {/* Chart component is rendered here */}
-          {React.cloneElement(data.children as React.ReactElement, {
-            ref: chartRef,
-            width,
-          })}
+        <div className="bg-transparent">
+          <BasicChart chartId={data.chartId} width={width} ref={chartRef} />
         </div>
       </div>
     </div>

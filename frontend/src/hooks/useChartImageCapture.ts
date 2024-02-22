@@ -10,7 +10,7 @@ export function useChartImageCapture(plotData: Data[], chartId: string) {
     Plotly.toImage(
       { data: plotData },
       {
-        format: "jpeg",
+        format: "png",
         height: 600,
         width: 600,
       }
