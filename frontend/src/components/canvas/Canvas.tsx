@@ -185,6 +185,8 @@ export default function Canvas({ activeChartId, chartIds }: CanvasProps) {
     }, 50);
   }, [activeChartId, nodes.length, flowInstance.current]);
 
+  const proOptions = { hideAttribution: true };
+
   return (
     <div className="h-full">
       <ReactFlow
@@ -199,6 +201,7 @@ export default function Canvas({ activeChartId, chartIds }: CanvasProps) {
         translateExtent={extent}
         nodeExtent={nodeExtent}
         edgesFocusable={false}
+        proOptions={proOptions}
         // fitView
       >
         <Controls />
@@ -207,3 +210,4 @@ export default function Canvas({ activeChartId, chartIds }: CanvasProps) {
     </div>
   );
 }
+
