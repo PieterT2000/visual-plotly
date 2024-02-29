@@ -10,6 +10,7 @@ export const defaultChart = {
       chartType: [{ value: "bar", label: "Bar Chart" }] as ChartTypeOption[],
       color: "#0693E3",
       lineColor: "#FF6900",
+      marker: { color: "#EB144C"},
       label: "Trace A",
       id: nanoid(),
     },

@@ -55,6 +55,7 @@ const ChartConfiguration = () => {
    */
   const [colorPickerOpen, setColorPickerOpen] = useState(false);
   const [lineColorPickerOpen, setLineColorPickerOpen] = useState(false);
+  const [markerColorPickerOpen, setMarkerColorPickerOpen] = useState(false);
   // const colorRef = useRef<HTMLDivElement>(null);
   // const lineColorRef = useRef<HTMLDivElement>(null);
 
@@ -306,6 +307,38 @@ const ChartConfiguration = () => {
                           color={activeTrace?.lineColor}
                           onChange={(color) =>
                             handleUpdateTrace({ lineColor: color.hex })
+                          }
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {activeTrace?.chartType.some(
+                (option) => option.value === "scatter"
+              ) && (
+                <div className="flex items-center space-x-2">
+                  <Label htmlFor="chartType">Scatter Color</Label>
+                  <div className="relative w-[30px] h-[30px] ">
+                    <button
+                      className="rounded-sm h-full w-full"
+                      style={{ background: activeTrace?.marker.color }}
+                      onClick={() =>
+                        setMarkerColorPickerOpen(!markerColorPickerOpen)
+                      }
+                    />
+                    {markerColorPickerOpen && (
+                      <div className="absolute top-100 left-0">
+                        <TwitterPicker
+                          color={activeTrace?.marker.color}
+                          onChange={(color) =>
+                            handleUpdateTrace({
+                              marker: {
+                                ...activeTrace.marker,
+                                color: color.hex,
+                              },
+                            })
                           }
                         />
                       </div>

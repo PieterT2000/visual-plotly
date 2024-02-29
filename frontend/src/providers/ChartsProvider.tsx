@@ -45,6 +45,7 @@ const emptyTrace = {
   chartType: [] as ChartTypeOption[],
   color: "",
   lineColor: "",
+  marker: { color: "" },
   label: "",
   id: "dummy-trace",
 };
@@ -104,6 +105,7 @@ const ChartsProvider = ({ children, files }: ChartsProviderProps) => {
             id: newTraceId,
             color: getRandomPlotlyColor(),
             lineColor: getRandomPlotlyColor(),
+            marker: { color: getRandomPlotlyColor() },
           },
         ],
       },
@@ -151,6 +153,7 @@ const ChartsProvider = ({ children, files }: ChartsProviderProps) => {
           id: newTraceId,
           color: getRandomPlotlyColor(),
           lineColor: getRandomPlotlyColor(),
+          marker: { color: getRandomPlotlyColor() },
         },
       ],
     });

@@ -64,6 +64,9 @@ const plotDataSelectors: Record<ChartType, PlotDataSelector> = {
       x: xValues,
       y: yValues,
       mode: "markers",
+      marker: {
+        color: trace.marker.color,
+      },
       name: trace.label,
       extra: {
         aspect: 4 / 3,
