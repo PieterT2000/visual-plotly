@@ -56,9 +56,14 @@ module.exports = {
           DEFAULT: "#f7f7f7",
           hover: "#eaeaea",
         },
+        dark: {
+          DEFAULT: "var(--dark)",
+          foreground: "var(--dark-foreground)",
+        },
       },
       boxShadow: {
         apple: "var(--shadow-apple)",
+        vert: "var(--shadow-vert)",
       },
       borderRadius: {
         lg: "var(--radius)",

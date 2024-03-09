@@ -2,11 +2,16 @@ import Plotly, { Data } from "plotly.js-cartesian-dist-min";
 import { useEffect } from "react";
 import { useChartsContext } from "src/providers/context/ChartsContext";
 
-export function useChartImageCapture(plotData: Data[], chartId: string) {
+export function useChartImageCapture(
+  plotData: Data[] | undefined,
+  chartId: string
+) {
   const { setChartThumb } = useChartsContext();
 
+  Plotly.toImage;
+
   useEffect(() => {
-    if (!chartId) return;
+    if (!chartId || !plotData) return;
     Plotly.toImage(
       { data: plotData },
       {

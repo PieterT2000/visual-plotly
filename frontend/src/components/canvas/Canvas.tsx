@@ -1,4 +1,4 @@
-import { useEffect, useRef, CSSProperties } from "react";
+import { useEffect, useRef, CSSProperties, useState, useMemo } from "react";
 import ReactFlow, {
   useNodesState,
   Controls,
@@ -11,32 +11,27 @@ import ReactFlow, {
   useEdgesState,
 } from "reactflow";
 
-import "reactflow/dist/style.css";
+import "src/styles/reactflow.css";
 import { ChartNode, ChartNodeData } from "./ChartNode";
 import { InvisibleNode } from "./InvisibleNode";
-import { defaultChartWidth } from "../consts";
+import {
+  a4Extent,
+  defaultChartWidth,
+  innerMargin,
+  nodeExtent,
+} from "../consts";
 
-interface CanvasProps {
-  activeChartId?: string;
-  /** Should be passed in same order as children */
-  chartIds: string[];
-}
+import ExportButton from "./ExportButton";
+import ExportDialog from "./ExportDialog";
+import { useExportCanvas } from "src/hooks/useExportCanvas";
+import { Skeleton } from "../ui/skeleton";
+import { useChartsContext } from "src/providers/context/ChartsContext";
+import type { PlotParams } from "react-plotly.js";
 
 const nodeTypes = { chart: ChartNode, invisible: InvisibleNode };
 
-const a4Extent = [
-  [0, 0],
-  [446, 631],
-].map((arr) => arr.map((i) => i * 2)) as CoordinateExtent;
-
-export const innerMargin = 10;
 const outerXMargin = 100;
 const outerYMargin = 50;
-// add inner padding to node extent
-export const nodeExtent = [
-  [a4Extent[0][0] + innerMargin, a4Extent[0][1] + innerMargin],
-  [a4Extent[1][0] - innerMargin, a4Extent[1][1] - innerMargin],
-] as CoordinateExtent;
 
 // add padding to extent
 const extent = [
@@ -111,24 +106,36 @@ const borderEdges: Edge[] = [
     source: "tl",
     target: "tr",
     type: "straight",
+    style: {
+      strokeDasharray: "5, 5",
+    },
   },
   {
     id: "tr->br",
     source: "tr",
     target: "br",
     type: "straight",
+    style: {
+      strokeDasharray: "5, 5",
+    },
   },
   {
     id: "br->bl",
     source: "br",
     target: "bl",
     type: "straight",
+    style: {
+      strokeDasharray: "5, 5",
+    },
   },
   {
     id: "bl->tl",
     source: "bl",
     target: "tl",
     type: "straight",
+    style: {
+      strokeDasharray: "5, 5",
+    },
   },
 ];
 
@@ -146,26 +153,93 @@ function getXYDefaultPlacement(index: number) {
   }
 }
 
-export default function Canvas({ activeChartId, chartIds }: CanvasProps) {
+const Canvas = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState<
     ChartNodeData | { style: CSSProperties }
   >(initialNodes);
   const [edges, _, onEdgesChange] = useEdgesState(borderEdges);
   const flowInstance = useRef<ReactFlowInstance>();
 
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [pdfPreviewImage, setPdfPreviewImage] = useState<string | null>(null);
+  const { charts, activeChart } = useChartsContext();
+
+  const activeChartId = activeChart?.id;
+  const chartIds = useMemo(() => {
+    return charts.map((chart) => chart.id);
+  }, [charts]);
+
+  const handleExportButtonClick = () => {
+    setDialogOpen(true);
+  };
+
+  const { downloadPdf, renderPreviewImage, isLoading } = useExportCanvas(
+    flowInstance.current
+  );
+  const handleJsonExport = () => {
+    const exportData = [] as {
+      layout: PlotParams["layout"];
+      data: PlotParams["data"];
+    }[];
+    const chartElements = document
+      .querySelector(".react-flow__viewport")
+      ?.querySelectorAll(".p-chart");
+    chartElements?.forEach((el) => {
+      const chartComponent = el as HTMLDivElement & PlotParams;
+      exportData.push({
+        layout: chartComponent.layout,
+        data: chartComponent.data,
+      });
+    });
+
+    // download the data as a JSON file
+    const data = JSON.stringify(exportData, null, 2);
+    const blob = new Blob([data], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const aTag = document.createElement("a");
+    aTag.href = url;
+    aTag.download = "data.json";
+    aTag.click();
+  };
+
+  const handleExportDialogSubmit = (selectedTab: "pdf" | "json") => {
+    if (selectedTab === "pdf") {
+      downloadPdf();
+    } else if (selectedTab === "json") {
+      handleJsonExport();
+    }
+    setDialogOpen(false);
+  };
+
   useEffect(() => {
     if (!chartIds) return;
 
-    const newNodes = chartIds.map((id, index) => ({
+    // Delete nodes that are not in the chartIds
+    const filteredNodes = nodes.filter(
+      (node) => node.type === commonNodeProps.type || chartIds.includes(node.id)
+    );
+
+    // Add nodes that are in the chartIds but not in the nodes
+    const newChartIds = chartIds.filter(
+      (id) => !nodes.find((node) => node.id === id)
+    );
+
+    const nodesToBeAdded = newChartIds.map((id, index) => ({
       id,
       type: "chart",
-      position: getXYDefaultPlacement(index), // TODO: calculate position in a better way
+      position: getXYDefaultPlacement(
+        filteredNodes.length - initialNodes.length + index
+      ), // TODO: calculate position in a better way
       data: {
         chartId: id,
       },
     }));
 
-    setNodes([...initialNodes, ...newNodes]);
+    if (filteredNodes.length === nodes.length && newChartIds.length === 0)
+      return;
+
+    const newNodes = [...filteredNodes, ...nodesToBeAdded];
+    setNodes(newNodes);
   }, [chartIds]);
 
   useEffect(() => {
@@ -187,6 +261,14 @@ export default function Canvas({ activeChartId, chartIds }: CanvasProps) {
 
   const proOptions = { hideAttribution: true };
 
+  useEffect(() => {
+    if (dialogOpen) {
+      renderPreviewImage().then(
+        (base64Image) => base64Image && setPdfPreviewImage(base64Image)
+      );
+    }
+  }, [dialogOpen]);
+
   return (
     <div className="h-full">
       <ReactFlow
@@ -202,12 +284,33 @@ export default function Canvas({ activeChartId, chartIds }: CanvasProps) {
         nodeExtent={nodeExtent}
         edgesFocusable={false}
         proOptions={proOptions}
-        // fitView
       >
         <Controls />
+        <ExportButton onClick={handleExportButtonClick} />
         <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
       </ReactFlow>
+      <ExportDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onSubmit={handleExportDialogSubmit}
+        isLoading={isLoading}
+      >
+        <div className="flex justify-center">
+          {pdfPreviewImage ? (
+            <img className=" w-[80%]" src={pdfPreviewImage} alt="PDF preview" />
+          ) : (
+            <div className="flex flex-col w-[80%] space-y-4 py-8">
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-[70%]" />
+                <Skeleton className="h-4 w-[200px]" />
+              </div>
+              <Skeleton className="h-[125px] w-[80%] rounded-lg" />
+            </div>
+          )}
+        </div>
+      </ExportDialog>
     </div>
   );
-}
+};
 
+export default Canvas;

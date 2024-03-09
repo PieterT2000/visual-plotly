@@ -16,6 +16,7 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
+      external: ["canvg", "dompurify", "html2canvas"],
       output: {
         manualChunks: {
           plotly: ["plotly.js-cartesian-dist-min", "react-plotly.js"],

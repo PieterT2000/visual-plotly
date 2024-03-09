@@ -70,12 +70,9 @@ const ChartsProvider = ({ children, files }: ChartsProviderProps) => {
     [charts, activeChartId]
   );
 
-  // console.log("activechart", activeChart?.traces);
   const activeTrace = useMemo(() => {
-    console.log(typeof activeTraceId, activeTraceId);
     return activeChart?.traces.find((trace) => trace.id === activeTraceId);
   }, [activeChart?.traces, activeTraceId]);
-  console.log("activeTraceId", activeTraceId);
 
   useEffect(() => {
     if (files.length === 0) return;
@@ -179,7 +176,6 @@ const ChartsProvider = ({ children, files }: ChartsProviderProps) => {
         const updatedTraces = activeChart.traces.filter(
           (trace) => trace.id !== traceId
         );
-        console.log("updatedTraces #1", updatedTraces);
         handleUpdateChart({ traces: updatedTraces }, chartId);
 
         if (updatedTraces.length === 0) {
@@ -187,8 +183,6 @@ const ChartsProvider = ({ children, files }: ChartsProviderProps) => {
           handleUpdateChart({ traces: [{ ...emptyTrace }] }, chartId);
         } else {
           setActiveTraceId(updatedTraces[0].id);
-          console.log("updatedTraces #2", updatedTraces);
-          console.log("new updated Trace", updatedTraces[0].id);
         }
       }
     },

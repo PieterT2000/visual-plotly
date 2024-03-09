@@ -61,7 +61,6 @@ const ChartConfiguration = () => {
 
   const {
     data,
-    charts,
     activeChart,
     activeTrace,
     handleAddTrace,
@@ -124,14 +123,14 @@ const ChartConfiguration = () => {
         <ChartConfigFields />
         <div className="px-2">
           <TypographyH3 className="mb-6">Traces Options</TypographyH3>
-          <div className="border-secondary border-b flex mx-2 mb-4 overflow-auto">
+          <div className="border-dark border-b flex mx-2 mb-4 overflow-auto">
             {activeChart?.traces.map((trace, idx) => (
               <Button
                 key={trace.id}
                 className={cn(
                   "relative px-2 w-[90px] justify-between border-none bg-transparent rounded-none text-black rounded-t-md hover:bg-cgray-hover ",
                   trace.id === activeTrace?.id &&
-                    "text-white bg-secondary hover:bg-secondary hover:text-white"
+                    "text-white bg-dark hover:bg-dark hover:text-white"
                 )}
                 onClick={() => setActiveTraceId(trace.id)}
                 variant="ghost"
@@ -351,10 +350,7 @@ const ChartConfiguration = () => {
         </div>
       </div>
       <div className="flex grow flex-col justify-center h-screen">
-        <Canvas
-          activeChartId={activeChart?.id}
-          chartIds={charts.map((chart) => chart.id)}
-        />
+        <Canvas />
       </div>
     </div>
   );

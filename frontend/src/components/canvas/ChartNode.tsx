@@ -2,8 +2,7 @@ import { useMemo, useRef, useState } from "react";
 import { NodeProps, NodeResizer, ResizeParams } from "reactflow";
 import { TypographyH3, TypographyP } from "../ui";
 import { useChartsContext } from "src/providers/context/ChartsContext";
-import { innerMargin, nodeExtent } from "./Canvas";
-import { defaultChartWidth } from "../consts";
+import { defaultChartWidth, innerMargin, nodeExtent } from "../consts";
 import BasicChart from "../charts/BasicChart";
 
 export interface ChartNodeData {
@@ -39,6 +38,15 @@ export const ChartNode = ({ data }: NodeProps<ChartNodeData>) => {
             maxWidth={nodeExtent[1][0] - innerMargin}
             onResize={handleResize}
             keepAspectRatio
+            lineStyle={{ borderColor: "rgba(37,99,235,0.4)" }}
+            handleStyle={{
+              backgroundColor: "hsl(var(--primary))",
+              width: 8,
+              height: 8,
+              borderRadius: "999px",
+            }}
+            handleClassName="resize-handle"
+            lineClassName="resize-line"
           />
         )}
         <div className="bg-transparent">
