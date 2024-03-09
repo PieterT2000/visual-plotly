@@ -28,7 +28,7 @@ export const ChartNode = ({ data }: NodeProps<ChartNodeData>) => {
   return (
     <div style={{ width: width + 16 }}>
       <div>
-        <TypographyH3>{chart?.title}</TypographyH3>
+        <TypographyH3 className="break-words">{chart?.title}</TypographyH3>
         <TypographyP className="w-full">{chart?.description}</TypographyP>
       </div>
       <div className="relative p-2">

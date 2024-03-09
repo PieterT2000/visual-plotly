@@ -8,7 +8,7 @@ const ChartConfigFields = () => {
   const { handleUpdateChart, activeChart } = useChartsContext();
   return (
     <div className="px-2">
-      <TypographyH3 className="mb-6">Chart Options</TypographyH3>
+      <TypographyH3 className="mb-6 ">Chart Options</TypographyH3>
       <div className="space-y-2">
         <div className="space-y-2 px-2">
           <Label htmlFor="documentTitle">Title</Label>
@@ -46,6 +46,7 @@ const ChartConfigFields = () => {
             }
             className="shadow-sm border-none rounded-sm"
             placeholder="Enter chart title"
+            maxLength={50}
           />
         </div>
       </div>
