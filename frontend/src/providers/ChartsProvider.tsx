@@ -1,7 +1,7 @@
 import { nanoid } from "nanoid";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
-  ChartTypeOption,
+  Chart,
   Charts,
   ChartsContext,
   IChartsContext,
@@ -42,7 +42,6 @@ const emptyTrace = {
   selectedDataKey: "",
   xAxisKey: "",
   yAxisKey: "",
-  chartType: [] as ChartTypeOption[],
   color: "",
   lineColor: "",
   marker: { color: "" },
@@ -61,6 +60,7 @@ const ChartsProvider = ({ children, files }: ChartsProviderProps) => {
   const [charts, setCharts] = useState<Charts>([defaultChart]);
   const [activeChartId, setActiveChartId] = useState(defaultChart.id);
   const [activeTraceId, setActiveTraceId] = useState(defaultChart.traces[0].id);
+  // Thumb images for the chart tabs in the sidebar
   const [chartThumbs, setChartThumbs] = useState<IChartsContext["chartThumbs"]>(
     {}
   );
@@ -112,7 +112,7 @@ const ChartsProvider = ({ children, files }: ChartsProviderProps) => {
   }, [charts]);
 
   const handleUpdateChart = useCallback(
-    (value: Partial<typeof defaultChart>, id: string = activeChartId) => {
+    (value: Partial<Chart>, id: string = activeChartId) => {
       const updatedCharts = charts.map((chart) => {
         if (chart.id === id) {
           return { ...chart, ...value };

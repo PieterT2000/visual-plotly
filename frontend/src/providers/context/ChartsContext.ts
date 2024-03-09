@@ -7,10 +7,10 @@ export const defaultChart = {
       selectedDataKey: "month.downtimes.dailyLosses",
       xAxisKey: "date",
       yAxisKey: "hours",
-      chartType: [{ value: "bar", label: "Bar Chart" }] as ChartTypeOption[],
+      chartType: "bar" as SupportedChartTypes,
       color: "#0693E3",
       lineColor: "#FF6900",
-      marker: { color: "#EB144C"},
+      marker: { color: "#EB144C" },
       label: "Trace A",
       id: nanoid(),
     },
@@ -21,31 +21,49 @@ export const defaultChart = {
   xAxisLabel: "X Axis",
   yAxisLabel: "Y Axis",
   title: "Daily Revenue",
-  description: "The Daily Revenue Chart provides a visual representation of the revenue generated each day.",
+  description:
+    "The Daily Revenue Chart provides a visual representation of the revenue generated each day.",
 };
 
 const defaultContext = {
   charts: [],
   data: {},
   chartThumbs: {},
-  handleAddChart: () => { },
-  handleAddTrace: () => { },
-  handleUpdateChart: () => { },
-  handleDeleteChart: () => { },
-  handleUpdateTrace: () => { },
-  handleDeleteTrace: () => { },
-  setActiveChartId: () => { },
-  setActiveTraceId: () => { },
-  setChartThumb: () => { },
+  handleAddChart: () => {},
+  handleAddTrace: () => {},
+  handleUpdateChart: () => {},
+  handleDeleteChart: () => {},
+  handleUpdateTrace: () => {},
+  handleDeleteTrace: () => {},
+  setActiveChartId: () => {},
+  setActiveTraceId: () => {},
+  setChartThumb: () => {},
 };
 
 type SupportedChartTypes = "bar" | "pie" | "scatter" | "line";
 export type ChartType = SupportedChartTypes;
-export type ChartTypeOption = { value: ChartType; label: string };
-export type Chart = typeof defaultChart;
+export interface Chart {
+  id: string;
+  name: string;
+  image: string;
+  xAxisLabel: string;
+  yAxisLabel: string;
+  title: string;
+  description: string;
+  traces: {
+    selectedDataKey: string;
+    xAxisKey: string;
+    yAxisKey: string;
+    chartType?: ChartType;
+    color: string;
+    lineColor: string;
+    marker: { color: string };
+    label: string;
+    id: string;
+  }[];
+}
 export type Charts = Chart[];
 export type Trace = Chart["traces"][0];
-
 
 export interface IChartsContext {
   charts: Charts;

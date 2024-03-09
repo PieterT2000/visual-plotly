@@ -92,8 +92,8 @@ export function getPlotlyChartDataOptions(
   const plotDataOptions = chartState?.traces.reduce(
     (acc: ReturnType<PlotDataSelector>[], traceConfig, idx) => {
       const { chartType } = traceConfig;
-      if (chartType.length === 0 || dataToPlot.length === 0) return acc;
-      const plotData = plotDataSelectors[chartType[0].value](
+      if (!chartType || dataToPlot.length === 0) return acc;
+      const plotData = plotDataSelectors[chartType](
         dataToPlot[idx],
         traceConfig
       );

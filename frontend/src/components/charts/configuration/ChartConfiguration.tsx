@@ -2,7 +2,6 @@ import { MouseEvent, useMemo, useState } from "react";
 import { SelectGroup, SelectItem, SelectLabel } from "components/ui/select";
 import get from "lodash.get";
 import { PlusIcon, X } from "lucide-react";
-import MultiSelect, { MultiValue } from "react-select";
 import ConfigurationSelect from "./ConfigurationSelect";
 import { Button } from "src/components/ui/button";
 import { capitalize, cn } from "src/utils";
@@ -11,7 +10,6 @@ import { Label } from "components/ui/label";
 import {
   useChartsContext,
   ChartType,
-  ChartTypeOption,
 } from "src/providers/context/ChartsContext";
 import { TwitterPicker } from "react-color";
 import Canvas from "src/components/canvas/Canvas";
@@ -56,8 +54,6 @@ const ChartConfiguration = () => {
   const [colorPickerOpen, setColorPickerOpen] = useState(false);
   const [lineColorPickerOpen, setLineColorPickerOpen] = useState(false);
   const [markerColorPickerOpen, setMarkerColorPickerOpen] = useState(false);
-  // const colorRef = useRef<HTMLDivElement>(null);
-  // const lineColorRef = useRef<HTMLDivElement>(null);
 
   const {
     data,
@@ -78,14 +74,12 @@ const ChartConfiguration = () => {
       selectedDataKey: value,
       xAxisKey: "",
       yAxisKey: "",
-      chartType: [],
+      chartType: undefined,
     });
   const setXAxisKey = (value: string) => handleUpdateTrace({ xAxisKey: value });
   const setYAxisKey = (value: string) => handleUpdateTrace({ yAxisKey: value });
-  const setChartType = (
-    options: MultiValue<{ value: ChartType; label: string }>
-  ) => {
-    handleUpdateTrace({ chartType: options as ChartTypeOption[] });
+  const setChartType = (chartType: string) => {
+    handleUpdateTrace({ chartType: chartType as ChartType });
   };
 
   const [xAxisKeys, yAxisKeys, chartTypeOptions] = useMemo(() => {
@@ -117,9 +111,10 @@ const ChartConfiguration = () => {
     handleDeleteTrace(traceId, chartId);
   };
 
-  const isPieSelected =
-    activeTrace?.chartType.some((typeOption) => typeOption.value === "pie") ??
-    false;
+  const isPieSelected = activeTrace?.chartType === "pie";
+  const isBarSelected = activeTrace?.chartType === "bar";
+  const isLineSelected = activeTrace?.chartType === "line";
+  const isScatterSelected = activeTrace?.chartType === "scatter";
 
   return (
     <div className="flex items-center h-full">
@@ -250,30 +245,29 @@ const ChartConfiguration = () => {
             )}
 
             <div className="space-y-1">
-              <Label htmlFor="chartType">Chart Type</Label>
-              <MultiSelect
-                className="shadow-sm"
-                styles={{
-                  control: (baseStyles) => ({
-                    ...baseStyles,
-                    border: "none",
-                    borderRadius: "calc(var(--radius) - 4px)",
-                  }),
-                }}
+              <ConfigurationSelect
+                className="w-full"
                 placeholder="Select chart type"
+                label="Chart Type"
                 name="chartType"
-                isDisabled={!(activeTrace?.xAxisKey && activeTrace?.yAxisKey)}
-                isMulti={true}
-                options={chartTypeOptions}
-                value={activeTrace?.chartType ?? []}
+                disabled={!(activeTrace?.xAxisKey && activeTrace?.yAxisKey)}
+                value={activeTrace?.chartType ?? ""}
                 onChange={setChartType}
-              />
+              >
+                {chartTypeOptions.map((option) => (
+                  <SelectItem
+                    key={option.value}
+                    value={option.value}
+                    className="capitalize"
+                  >
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </ConfigurationSelect>
             </div>
 
             <div className="flex space-x-4">
-              {activeTrace?.chartType.some(
-                (option) => option.value === "bar"
-              ) && (
+              {isBarSelected && (
                 <div className="flex items-center space-x-2">
                   <Label htmlFor="chartType">Bar Color</Label>
                   <div className="relative w-[30px] h-[30px] ">
@@ -296,9 +290,7 @@ const ChartConfiguration = () => {
                 </div>
               )}
 
-              {activeTrace?.chartType.some(
-                (option) => option.value === "line"
-              ) && (
+              {isLineSelected && (
                 <div className="flex items-center space-x-2">
                   <Label htmlFor="chartType">Line Color</Label>
                   <div className="relative w-[30px] h-[30px] ">
@@ -323,9 +315,7 @@ const ChartConfiguration = () => {
                 </div>
               )}
 
-              {activeTrace?.chartType.some(
-                (option) => option.value === "scatter"
-              ) && (
+              {isScatterSelected && (
                 <div className="flex items-center space-x-2">
                   <Label htmlFor="chartType">Scatter Color</Label>
                   <div className="relative w-[30px] h-[30px] ">
