@@ -117,6 +117,10 @@ const ChartConfiguration = () => {
     handleDeleteTrace(traceId, chartId);
   };
 
+  const isPieSelected =
+    activeTrace?.chartType.some((typeOption) => typeOption.value === "pie") ??
+    false;
+
   return (
     <div className="flex items-center h-full">
       <div className="py-8 space-y-8 w-[400px] lg:w-[500px] bg-cgray h-full flex flex-col">
@@ -160,15 +164,19 @@ const ChartConfiguration = () => {
             </Button>
           </div>
           <div className="px-4 space-y-2">
-            <Label htmlFor="traceTitle">Trace Label</Label>
-            <Input
-              name="traceTitle"
-              type="text"
-              value={activeTrace?.label}
-              onChange={(e) => handleUpdateTrace({ label: e.target.value })}
-              className="shadow-sm border-none rounded-sm"
-              placeholder="Enter trace label"
-            />
+            {!isPieSelected && (
+              <>
+                <Label htmlFor="traceTitle">Trace Label</Label>
+                <Input
+                  name="traceTitle"
+                  type="text"
+                  value={activeTrace?.label}
+                  onChange={(e) => handleUpdateTrace({ label: e.target.value })}
+                  className="shadow-sm border-none rounded-sm"
+                  placeholder="Enter trace label"
+                />
+              </>
+            )}
             <ConfigurationSelect
               label="Data key"
               value={activeTrace?.selectedDataKey ?? ""}
@@ -194,6 +202,7 @@ const ChartConfiguration = () => {
                   </SelectItem>
                 ))}
               </ConfigurationSelect>
+
               <ConfigurationSelect
                 className="w-full"
                 value={activeTrace?.yAxisKey ?? ""}
@@ -211,36 +220,35 @@ const ChartConfiguration = () => {
               </ConfigurationSelect>
             </div>
 
-            <div className="flex w-full justify-between space-x-4">
-              <div className="flex-1">
-                <Input
-                  id="XAxisLabel"
-                  type="text"
-                  className="shadow-sm border-none rounded-sm w-full"
-                  value={activeChart?.xAxisLabel ?? ""}
-                  onChange={(e) =>
-                    handleUpdateChart({
-                      xAxisLabel: e.target.value,
-                    })
-                  }
-                  placeholder="Enter X-axis label"
-                />
+            {!isPieSelected && (
+              <div className="flex w-full justify-between space-x-4">
+                <div className="flex-1">
+                  <Input
+                    id="XAxisLabel"
+                    type="text"
+                    className="shadow-sm border-none rounded-sm w-full"
+                    value={activeChart?.xAxisLabel ?? ""}
+                    onChange={(e) =>
+                      handleUpdateChart({ xAxisLabel: e.target.value })
+                    }
+                    placeholder="Enter X-axis label"
+                  />
+                </div>
+                <div className="flex-1">
+                  <Input
+                    id="YAxisLabel"
+                    type="text"
+                    className="shadow-sm border-none rounded-sm w-full"
+                    value={activeChart?.yAxisLabel ?? ""}
+                    onChange={(e) =>
+                      handleUpdateChart({ yAxisLabel: e.target.value })
+                    }
+                    placeholder="Enter Y-axis label"
+                  />
+                </div>
               </div>
-              <div className="flex-1">
-                <Input
-                  id="YAxisLabel"
-                  type="text"
-                  className="shadow-sm border-none rounded-sm w-full"
-                  value={activeChart?.yAxisLabel ?? ""}
-                  onChange={(e) =>
-                    handleUpdateChart({
-                      yAxisLabel: e.target.value,
-                    })
-                  }
-                  placeholder="Enter Y-axis label"
-                />
-              </div>
-            </div>
+            )}
+
             <div className="space-y-1">
               <Label htmlFor="chartType">Chart Type</Label>
               <MultiSelect
@@ -261,6 +269,7 @@ const ChartConfiguration = () => {
                 onChange={setChartType}
               />
             </div>
+
             <div className="flex space-x-4">
               {activeTrace?.chartType.some(
                 (option) => option.value === "bar"
