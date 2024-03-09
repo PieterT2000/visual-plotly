@@ -38,7 +38,8 @@
     "shiki": "^1.1.7",
     "stream-browserify": "^3.0.0",
     "tailwind-merge": "^2.0.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "usehooks-ts": "^3.0.1"
   },
   "devDependencies": {
     "@types/jest": "^29.5.7",

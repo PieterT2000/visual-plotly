@@ -8,8 +8,6 @@ export function useChartImageCapture(
 ) {
   const { setChartThumb } = useChartsContext();
 
-  Plotly.toImage;
-
   useEffect(() => {
     if (!chartId || !plotData) return;
     Plotly.toImage(

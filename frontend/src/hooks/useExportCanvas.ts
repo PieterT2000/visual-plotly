@@ -121,7 +121,7 @@ export function useExportCanvas(reactFlowInstance?: ReactFlowInstance) {
         resolve(dataUrl);
         clearTimeout(timeout);
         // Give the impression to the user that generating the pdf preview is an async operation
-      }, 1000);
+      }, 50);
     });
   }, [reactFlowInstance]);
 

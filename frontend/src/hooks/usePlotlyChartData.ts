@@ -17,14 +17,14 @@ type PlotDataSelector = (
 
 const plotDataSelectors: Record<ChartType, PlotDataSelector> = {
   bar: (data, trace: Trace) => {
-    const xValues = data.map((item) => item[trace.xAxisKey]);
-    const yValues = data.map((item) => item[trace.yAxisKey]);
+    const xValues = data.map((item) => get(item, trace.xAxisKey));
+    const yValues = data.map((item) => get(item, trace.yAxisKey));
     return {
       type: "bar",
       x: xValues,
       y: yValues,
       marker: {
-        color: trace.color,
+        color: trace.barColor,
       },
       name: trace.label,
       extra: {
@@ -33,8 +33,8 @@ const plotDataSelectors: Record<ChartType, PlotDataSelector> = {
     };
   },
   pie: (data, trace: Trace) => {
-    const labels = data.map((item) => item[trace.xAxisKey]);
-    const values = data.map((item) => item[trace.yAxisKey]);
+    const labels = data.map((item) => get(item, trace.xAxisKey));
+    const values = data.map((item) => get(item, trace.yAxisKey));
 
     return {
       type: "pie",
@@ -46,22 +46,25 @@ const plotDataSelectors: Record<ChartType, PlotDataSelector> = {
     };
   },
   scatter: (data, trace: Trace) => {
-    const xValues = data.map((item) => item[trace.xAxisKey]);
-    const yValues = data.map((item) => item[trace.yAxisKey]);
+    const xValues = data.map((item) => get(item, trace.xAxisKey));
+    const yValues = data.map((item) => get(item, trace.yAxisKey));
     return {
       type: "scatter",
       x: xValues,
       y: yValues,
       mode: "markers",
       name: trace.label,
+      marker: {
+        color: trace.markerColor,
+      },
       extra: {
         aspect: 4 / 3,
       },
     };
   },
   line: (data, trace: Trace) => {
-    const xValues = data.map((item) => item[trace.xAxisKey]);
-    const yValues = data.map((item) => item[trace.yAxisKey]);
+    const xValues = data.map((item) => get(item, trace.xAxisKey));
+    const yValues = data.map((item) => get(item, trace.yAxisKey));
     return {
       type: "scatter",
       x: xValues,

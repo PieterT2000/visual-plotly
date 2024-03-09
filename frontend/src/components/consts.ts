@@ -1,6 +1,6 @@
 import { CoordinateExtent } from "reactflow";
 
-export const defaultChartWidth = 350
+export const defaultChartWidth = 350;
 
 export const a4Extent = [
   [0, 0],

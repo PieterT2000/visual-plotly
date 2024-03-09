@@ -1,29 +1,4 @@
-import { nanoid } from "nanoid";
 import { createContext, useContext } from "react";
-
-export const defaultChart = {
-  traces: [
-    {
-      selectedDataKey: "month.downtimes.dailyLosses",
-      xAxisKey: "date",
-      yAxisKey: "hours",
-      chartType: "bar" as SupportedChartTypes,
-      color: "#0693E3",
-      lineColor: "#FF6900",
-      marker: { color: "#EB144C" },
-      label: "Trace A",
-      id: nanoid(),
-    },
-  ],
-  id: nanoid(),
-  name: "Chart A",
-  image: "",
-  xAxisLabel: "X Axis",
-  yAxisLabel: "Y Axis",
-  title: "Daily Revenue",
-  description:
-    "The Daily Revenue Chart provides a visual representation of the revenue generated each day.",
-};
 
 const defaultContext = {
   charts: [],
@@ -55,9 +30,9 @@ export interface Chart {
     xAxisKey: string;
     yAxisKey: string;
     chartType?: ChartType;
-    color: string;
-    lineColor: string;
-    marker: { color: string };
+    barColor?: string;
+    lineColor?: string;
+    markerColor?: string;
     label: string;
     id: string;
   }[];

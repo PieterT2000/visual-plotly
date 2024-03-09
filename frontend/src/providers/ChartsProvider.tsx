@@ -5,8 +5,8 @@ import {
   Charts,
   ChartsContext,
   IChartsContext,
-  defaultChart,
 } from "./context/ChartsContext";
+import { getRandomPlotlyColor } from "src/utils/colors";
 
 const emptyChart = {
   traces: [],
@@ -19,32 +19,13 @@ const emptyChart = {
   description: "",
 };
 
-const defaultPlotlyColors = [
-  "#1f77b4", // muted blue
-  "#ff7f0e", // safety orange
-  "#2ca02c", // cooked asparagus green
-  "#d62728", // brick red
-  "#9467bd", // muted purple
-  "#8c564b", // chestnut brown
-  "#e377c2", // raspberry yogurt pink
-  "#7f7f7f", // middle gray
-  "#bcbd22", // curry yellow-green
-  "#17becf", // blue-teal
-];
-
-function getRandomPlotlyColor() {
-  return defaultPlotlyColors[
-    Math.floor(Math.random() * defaultPlotlyColors.length)
-  ];
-}
-
 const emptyTrace = {
   selectedDataKey: "",
   xAxisKey: "",
   yAxisKey: "",
-  color: "",
+  barColor: "",
   lineColor: "",
-  marker: { color: "" },
+  markerColor: "",
   label: "",
   id: "dummy-trace",
 };
@@ -54,12 +35,34 @@ interface ChartsProviderProps {
   children: React.ReactNode;
 }
 
+function createInitialChartState() {
+  const newChartId = nanoid();
+  const newTraceId = nanoid();
+  return {
+    ...emptyChart,
+    id: newChartId,
+    traces: [
+      {
+        ...emptyTrace,
+        id: newTraceId,
+        barColor: getRandomPlotlyColor(),
+        lineColor: getRandomPlotlyColor(),
+        markerColor: getRandomPlotlyColor(),
+      },
+    ],
+  };
+}
+
+function createInitialChartsState() {
+  return [createInitialChartState()];
+}
+
 const ChartsProvider = ({ children, files }: ChartsProviderProps) => {
   // eslint-disable-next-line
   const [data, setData] = useState<any>();
-  const [charts, setCharts] = useState<Charts>([defaultChart]);
-  const [activeChartId, setActiveChartId] = useState(defaultChart.id);
-  const [activeTraceId, setActiveTraceId] = useState(defaultChart.traces[0].id);
+  const [charts, setCharts] = useState<Charts>(createInitialChartsState);
+  const [activeChartId, setActiveChartId] = useState(charts[0].id);
+  const [activeTraceId, setActiveTraceId] = useState(charts[0].traces[0].id);
   // Thumb images for the chart tabs in the sidebar
   const [chartThumbs, setChartThumbs] = useState<IChartsContext["chartThumbs"]>(
     {}
@@ -91,22 +94,7 @@ const ChartsProvider = ({ children, files }: ChartsProviderProps) => {
   const handleAddChart = useCallback(() => {
     const newChartId = nanoid();
     const newTraceId = nanoid();
-    setCharts((prevCharts) => [
-      ...prevCharts,
-      {
-        ...emptyChart,
-        id: newChartId,
-        traces: [
-          {
-            ...emptyTrace,
-            id: newTraceId,
-            color: getRandomPlotlyColor(),
-            lineColor: getRandomPlotlyColor(),
-            marker: { color: getRandomPlotlyColor() },
-          },
-        ],
-      },
-    ]);
+    setCharts((prevCharts) => [...prevCharts, createInitialChartState()]);
     setActiveChartId(newChartId);
     setActiveTraceId(newTraceId);
   }, [charts]);
@@ -148,9 +136,9 @@ const ChartsProvider = ({ children, files }: ChartsProviderProps) => {
         {
           ...emptyTrace,
           id: newTraceId,
-          color: getRandomPlotlyColor(),
+          barColor: getRandomPlotlyColor(),
           lineColor: getRandomPlotlyColor(),
-          marker: { color: getRandomPlotlyColor() },
+          markerColor: getRandomPlotlyColor(),
         },
       ],
     });
