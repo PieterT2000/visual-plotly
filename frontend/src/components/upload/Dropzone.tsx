@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FileUploader, FileCard, MimeType, FileRejection } from "evergreen-ui";
 import { cn } from "../../utils";
 import { Button } from "../ui/button";
@@ -27,8 +27,43 @@ export function Dropzone({ onContinue, className = "" }: DropzoneProps) {
     onContinue(urls);
   };
 
+  const validateJson = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const result = JSON.parse(event.target?.result as string);
+        if (Array.isArray(result))
+          throw new Error(
+            "Invalid JSON file. JSON file can't start with an array."
+          );
+      } catch (error: any) {
+        setFileRejections((prev) => [
+          ...prev,
+          {
+            file,
+            message: error.message,
+            reason: "INVALID_JSON",
+          },
+        ]);
+        setValidFiles([]);
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  useEffect(() => {
+    if (files.length === 0) return;
+    validateJson(files[0]);
+  }, [files]);
+
   return (
-    <div className="w-[800px]">
+    <div className="w-full md:max-w-[800px]">
+      <div>
+        <h3>Upload File</h3>
+        <p className="text-sm text-gray-500">
+          You can upload 1 file. The file must have a .json extension.
+        </p>
+      </div>
       <FileUploader
         acceptedMimeTypes={acceptedMimeTypes}
         className={cn(className)}

@@ -19,7 +19,7 @@ interface ConfigurationSelectProps {
   name: string;
 }
 
-const ConfigurationSelect = (props: ConfigurationSelectProps) => {
+const SelectBox = (props: ConfigurationSelectProps) => {
   return (
     <div className={cn("space-y-1", props.className)}>
       <Label htmlFor={props.name}>{props.label}</Label>
@@ -38,4 +38,4 @@ const ConfigurationSelect = (props: ConfigurationSelectProps) => {
   );
 };
 
-export default ConfigurationSelect;
+export default SelectBox;

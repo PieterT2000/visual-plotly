@@ -1,12 +1,12 @@
 import { nanoid } from "nanoid";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
-  ChartTypeOption,
+  Chart,
   Charts,
   ChartsContext,
   IChartsContext,
-  defaultChart,
 } from "./context/ChartsContext";
+import { getRandomPlotlyColor } from "src/utils/colors";
 
 const emptyChart = {
   traces: [],
@@ -15,34 +15,17 @@ const emptyChart = {
   image: "",
   xAxisLabel: "",
   yAxisLabel: "",
+  title: "",
+  description: "",
 };
-
-const defaultPlotlyColors = [
-  "#1f77b4", // muted blue
-  "#ff7f0e", // safety orange
-  "#2ca02c", // cooked asparagus green
-  "#d62728", // brick red
-  "#9467bd", // muted purple
-  "#8c564b", // chestnut brown
-  "#e377c2", // raspberry yogurt pink
-  "#7f7f7f", // middle gray
-  "#bcbd22", // curry yellow-green
-  "#17becf", // blue-teal
-];
-
-function getRandomPlotlyColor() {
-  return defaultPlotlyColors[
-    Math.floor(Math.random() * defaultPlotlyColors.length)
-  ];
-}
 
 const emptyTrace = {
   selectedDataKey: "",
   xAxisKey: "",
   yAxisKey: "",
-  chartType: [] as ChartTypeOption[],
-  color: "",
+  barColor: "",
   lineColor: "",
+  markerColor: "",
   label: "",
   id: "dummy-trace",
 };
@@ -52,12 +35,33 @@ interface ChartsProviderProps {
   children: React.ReactNode;
 }
 
+function createInitialChartState(chartId = nanoid(), traceId = nanoid()) {
+  return {
+    ...emptyChart,
+    id: chartId,
+    traces: [
+      {
+        ...emptyTrace,
+        id: traceId,
+        barColor: getRandomPlotlyColor(),
+        lineColor: getRandomPlotlyColor(),
+        markerColor: getRandomPlotlyColor(),
+      },
+    ],
+  };
+}
+
+function createInitialChartsState() {
+  return [createInitialChartState()];
+}
+
 const ChartsProvider = ({ children, files }: ChartsProviderProps) => {
   // eslint-disable-next-line
   const [data, setData] = useState<any>();
-  const [charts, setCharts] = useState<Charts>([defaultChart]);
-  const [activeChartId, setActiveChartId] = useState(defaultChart.id);
-  const [activeTraceId, setActiveTraceId] = useState(defaultChart.traces[0].id);
+  const [charts, setCharts] = useState<Charts>(createInitialChartsState);
+  const [activeChartId, setActiveChartId] = useState(charts[0].id);
+  const [activeTraceId, setActiveTraceId] = useState(charts[0].traces[0].id);
+  // Thumb images for the chart tabs in the sidebar
   const [chartThumbs, setChartThumbs] = useState<IChartsContext["chartThumbs"]>(
     {}
   );
@@ -67,10 +71,9 @@ const ChartsProvider = ({ children, files }: ChartsProviderProps) => {
     [charts, activeChartId]
   );
 
-  const activeTrace = useMemo(
-    () => activeChart?.traces.find((trace) => trace.id === activeTraceId),
-    [activeChart?.traces, activeTraceId]
-  );
+  const activeTrace = useMemo(() => {
+    return activeChart?.traces.find((trace) => trace.id === activeTraceId);
+  }, [activeChart?.traces, activeTraceId]);
 
   useEffect(() => {
     if (files.length === 0) return;
@@ -89,27 +92,16 @@ const ChartsProvider = ({ children, files }: ChartsProviderProps) => {
   const handleAddChart = useCallback(() => {
     const newChartId = nanoid();
     const newTraceId = nanoid();
-    setCharts([
-      ...charts,
-      {
-        ...emptyChart,
-        id: newChartId,
-        traces: [
-          {
-            ...emptyTrace,
-            id: newTraceId,
-            color: getRandomPlotlyColor(),
-            lineColor: getRandomPlotlyColor(),
-          },
-        ],
-      },
+    setCharts((prevCharts) => [
+      ...prevCharts,
+      createInitialChartState(newChartId, newTraceId),
     ]);
     setActiveChartId(newChartId);
     setActiveTraceId(newTraceId);
   }, [charts]);
 
   const handleUpdateChart = useCallback(
-    (value: Partial<typeof defaultChart>, id: string = activeChartId) => {
+    (value: Partial<Chart>, id: string = activeChartId) => {
       const updatedCharts = charts.map((chart) => {
         if (chart.id === id) {
           return { ...chart, ...value };
@@ -117,6 +109,22 @@ const ChartsProvider = ({ children, files }: ChartsProviderProps) => {
         return chart;
       });
       setCharts(updatedCharts);
+    },
+    [charts, activeChartId]
+  );
+
+  const handleDeleteChart = useCallback(
+    (id: string) => {
+      const updatedCharts = charts.filter((chart) => chart.id !== id);
+      setCharts(updatedCharts);
+
+      if (updatedCharts.length === 0) {
+        handleAddChart();
+      } else {
+        // If the active chart is deleted, set the first chart as active
+        setActiveChartId(updatedCharts[0].id);
+        setActiveTraceId(updatedCharts[0].traces[0].id);
+      }
     },
     [charts, activeChartId]
   );
@@ -129,8 +137,9 @@ const ChartsProvider = ({ children, files }: ChartsProviderProps) => {
         {
           ...emptyTrace,
           id: newTraceId,
-          color: getRandomPlotlyColor(),
+          barColor: getRandomPlotlyColor(),
           lineColor: getRandomPlotlyColor(),
+          markerColor: getRandomPlotlyColor(),
         },
       ],
     });
@@ -150,6 +159,25 @@ const ChartsProvider = ({ children, files }: ChartsProviderProps) => {
     [activeChart?.traces, activeTraceId, handleUpdateChart]
   );
 
+  const handleDeleteTrace = useCallback(
+    (traceId: string, chartId: string) => {
+      if (activeChart) {
+        const updatedTraces = activeChart.traces.filter(
+          (trace) => trace.id !== traceId
+        );
+        handleUpdateChart({ traces: updatedTraces }, chartId);
+
+        if (updatedTraces.length === 0) {
+          // reset last remaining trace tab to empty values
+          handleUpdateChart({ traces: [{ ...emptyTrace }] }, chartId);
+        } else {
+          setActiveTraceId(updatedTraces[0].id);
+        }
+      }
+    },
+    [activeChart?.traces, activeTraceId, handleUpdateChart]
+  );
+
   const contextValue = useMemo(
     () => ({
       charts,
@@ -160,7 +188,9 @@ const ChartsProvider = ({ children, files }: ChartsProviderProps) => {
       handleAddChart,
       handleAddTrace,
       handleUpdateChart,
+      handleDeleteChart,
       handleUpdateTrace,
+      handleDeleteTrace,
       setActiveChartId,
       setActiveTraceId,
       setChartThumb,
@@ -174,7 +204,9 @@ const ChartsProvider = ({ children, files }: ChartsProviderProps) => {
       handleAddChart,
       handleAddTrace,
       handleUpdateChart,
+      handleDeleteChart,
       handleUpdateTrace,
+      handleDeleteTrace,
       setChartThumb,
     ]
   );

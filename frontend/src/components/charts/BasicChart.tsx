@@ -1,110 +1,73 @@
-import Plot from "react-plotly.js";
-import { Data } from "plotly.js-dist-min";
-import { useMemo } from "react";
-import {
-  Trace,
-  ChartType,
-  useChartsContext,
-} from "src/providers/context/ChartsContext";
+import Plotly from "plotly.js-cartesian-dist-min";
+import createPlotlyComponent from "react-plotly.js/factory";
+import { PlotParams } from "react-plotly.js";
+import { forwardRef, useMemo, useRef } from "react";
 import { useChartImageCapture } from "src/hooks/useChartImageCapture";
+import {
+  plotlyGlobalConfig,
+  usePlotlyChartData,
+} from "src/hooks/usePlotlyChartData";
+import { useChartsContext } from "src/providers/context/ChartsContext";
+import { removeObjectKeys } from "src/utils";
 
-interface BasicChartProps {
-  data: { [key: string]: number | string }[][];
+// Use custom Plotly build
+const Plot = createPlotlyComponent(Plotly) as React.ComponentClass<PlotParams>;
+
+export interface BasicChartProps {
+  chartId: string;
+  width: number;
 }
 
-type PlotDataSelector = (
-  data: BasicChartProps["data"][0],
-  traceConfig: Trace
-) => Data;
+const BasicChart = forwardRef(
+  ({ chartId, width }: BasicChartProps, ref: React.Ref<any>) => {
+    const localRef = useRef(null);
+    const chartRef = ref ?? localRef;
 
-const plotDataSelectors: Record<ChartType, PlotDataSelector> = {
-  bar: (data, trace: Trace) => {
-    const xValues = data.map((item) => item[trace.xAxisKey]);
-    const yValues = data.map((item) => item[trace.yAxisKey]);
-    return {
-      type: "bar",
-      x: xValues,
-      y: yValues,
-      marker: {
-        color: trace.color,
-      },
-      title: {
-        text: trace.label,
-      },
-    };
-  },
-  pie: (data, trace: Trace) => {
-    const labels = data.map((item) => item[trace.xAxisKey]);
-    const values = data.map((item) => item[trace.yAxisKey]);
+    const { charts } = useChartsContext();
+    const chartState = useMemo(() => {
+      return charts.find((chart) => chart.id === chartId);
+    }, [chartId, charts]);
 
-    return {
-      type: "pie",
-      labels,
-      values,
-      title: {
-        text: trace.label,
-      },
-    };
-  },
-  scatter: (data, trace: Trace) => {
-    const xValues = data.map((item) => item[trace.xAxisKey]);
-    const yValues = data.map((item) => item[trace.yAxisKey]);
-    return {
-      type: "scatter",
-      x: xValues,
-      y: yValues,
-      mode: "markers",
-      title: {
-        text: trace.label,
-      },
-    };
-  },
-  line: (data, trace: Trace) => {
-    const xValues = data.map((item) => item[trace.xAxisKey]);
-    const yValues = data.map((item) => item[trace.yAxisKey]);
-    return {
-      type: "scatter",
-      x: xValues,
-      y: yValues,
-      mode: "lines",
-      line: {
-        color: trace.lineColor,
-      },
-      title: {
-        text: trace.label,
-      },
-    };
-  },
-};
+    const plotDataOptions = usePlotlyChartData(chartId);
 
-const BasicChart = (props: BasicChartProps) => {
-  const { activeChart: chartConfig } = useChartsContext();
-  const { data } = props;
-  const plotData = useMemo(() => {
-    if (!chartConfig) return [];
-    return chartConfig.traces.reduce((acc: Data[], traceConfig, idx) => {
-      const { chartType } = traceConfig;
-      if (chartType.length === 0 || data.length === 0) return acc;
-      acc.push(plotDataSelectors[chartType[0].value](data[idx], traceConfig));
-      return acc;
-    }, []);
-  }, [data, chartConfig]);
+    useChartImageCapture(plotDataOptions, chartId);
 
-  useChartImageCapture(plotData);
+    const dimensions = useMemo(() => {
+      // @ts-ignore
+      const aspect = plotDataOptions[0]?.extra.aspect ?? 4 / 3;
+      return {
+        width: Math.round(width),
+        height: Math.round(width / aspect),
+      };
+    }, [width]);
 
-  return (
-    <Plot
-      useResizeHandler
-      style={{ width: "100%", height: "100%" }}
-      data={plotData}
-      layout={{
-        autosize: true,
-        title: chartConfig?.name,
-        xaxis: { title: chartConfig?.xAxisLabel },
-        yaxis: { title: chartConfig?.yAxisLabel },
-      }}
-    />
-  );
-};
+    const filteredPlotData = useMemo(
+      () =>
+        plotDataOptions?.map((data) => removeObjectKeys(data, ["extra"])) ?? [],
+      [plotDataOptions]
+    );
+
+    return (
+      <Plot
+        className="p-chart"
+        ref={chartRef}
+        useResizeHandler
+        style={dimensions}
+        data={filteredPlotData}
+        layout={{
+          autosize: false,
+          title: chartState?.name,
+          xaxis: { title: chartState?.xAxisLabel },
+          yaxis: { title: chartState?.yAxisLabel },
+          paper_bgcolor: "rgba(0,0,0,0)",
+          plot_bgcolor: "rgba(0,0,0,0)",
+          width: dimensions.width,
+          height: dimensions.height,
+        }}
+        config={plotlyGlobalConfig}
+      />
+    );
+  }
+);
 
 export default BasicChart;

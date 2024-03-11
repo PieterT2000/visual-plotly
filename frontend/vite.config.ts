@@ -1,25 +1,34 @@
-import { defineConfig } from 'vite'
-import { nodePolyfills } from 'vite-plugin-node-polyfills'
-import react from '@vitejs/plugin-react'
-import path from 'path'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), nodePolyfills()],
+  plugins: [react()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      "src": path.resolve(__dirname, "./src"),
-      "components": path.resolve(__dirname, "./src/components"),
-      "utils": path.resolve(__dirname, "./src/utils/index.ts"),
-      "stream": "stream-browserify",
+      src: path.resolve(__dirname, "./src"),
+      components: path.resolve(__dirname, "./src/components"),
+      utils: path.resolve(__dirname, "./src/utils/index.ts"),
+      stream: "stream-browserify",
+    },
+  },
+  build: {
+    rollupOptions: {
+      external: ["canvg", "dompurify", "html2canvas"],
+      output: {
+        manualChunks: {
+          plotly: ["plotly.js-cartesian-dist-min", "react-plotly.js"],
+        },
+      },
     },
   },
   optimizeDeps: {
     esbuildOptions: {
       define: {
-        global: 'globalThis'
-      }
-    }
-  }
-})
+        global: "globalThis",
+      },
+    },
+  },
+});

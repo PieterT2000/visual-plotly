@@ -1,0 +1,11 @@
+<pre class="shiki one-dark-pro" style="background-color:#282c34;color:#abb2bf" tabindex="0"><code><span class="line"><span style="color:#C678DD">import</span><span style="color:#ABB2BF"> plotly.io </span><span style="color:#C678DD">as</span><span style="color:#ABB2BF"> pio</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#ABB2BF"> json</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic"># Please change the path to the </span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic"># location of the downloaded JSON file</span></span>
+<span class="line"><span style="color:#D19A66">JSON_FILE_PATH</span><span style="color:#56B6C2">=</span><span style="color:#98C379">'./report.json'</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">with</span><span style="color:#56B6C2"> open</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">JSON_FILE_PATH</span><span style="color:#ABB2BF">, </span><span style="color:#98C379">'r'</span><span style="color:#ABB2BF">) </span><span style="color:#C678DD">as</span><span style="color:#E06C75"> file</span><span style="color:#ABB2BF">:</span></span>
+<span class="line"><span style="color:#ABB2BF">    json_data </span><span style="color:#56B6C2">=</span><span style="color:#ABB2BF"> json.</span><span style="color:#61AFEF">load</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">file</span><span style="color:#ABB2BF">)</span></span>
+<span class="line"><span style="color:#C678DD">    for</span><span style="color:#ABB2BF"> chart </span><span style="color:#C678DD">in</span><span style="color:#ABB2BF"> json_data:</span></span>
+<span class="line"><span style="color:#ABB2BF">        pio.</span><span style="color:#61AFEF">show</span><span style="color:#ABB2BF">(chart)</span></span></code></pre>
