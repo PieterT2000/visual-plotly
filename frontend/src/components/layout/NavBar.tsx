@@ -39,21 +39,22 @@ const NavBar = () => {
             <img
               className={cn(
                 "rounded-apple h-[75px] w-[75px] overflow-hidden bg-appleFill border-2",
-                chart.id === activeChart?.id && "border-2 border-appleBorder"
+                chart.id === activeChart?.id &&
+                  "border-2 border-appleBorder border-primary/50"
               )}
               src={chartThumbs[chart.id]}
               alt={chart.name}
             />
-            <div className="chart_thumb-overlay absolute top-0 left-0 w-full h-full rounded-apple opacity-0 hover:opacity-100 flex items-center justify-center">
-              <span className="z-[999] text-white truncate px-1">
-                {chart.name}
-              </span>
-            </div>
             <div
               className="chart_thumb-delete"
               onClick={(evt) => onDeleteChart(chart, evt)}
             >
-              <X size={"15px"} />
+              <X className="icon" />
+            </div>
+            <div className="chart_thumb-overlay absolute top-0 left-0 w-full h-full rounded-apple flex items-center justify-center opacity-0">
+              <span className="z-[11] text-white truncate px-1">
+                {chart.title ?? chart.name}
+              </span>
             </div>
           </button>
         ))}

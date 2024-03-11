@@ -26,7 +26,6 @@ import ExportDialog from "./ExportDialog";
 import { useExportCanvas } from "src/hooks/useExportCanvas";
 import { Skeleton } from "../ui/skeleton";
 import { useChartsContext } from "src/providers/context/ChartsContext";
-import type { PlotParams } from "react-plotly.js";
 
 const nodeTypes = { chart: ChartNode, invisible: InvisibleNode };
 
@@ -173,40 +172,14 @@ const Canvas = () => {
     setDialogOpen(true);
   };
 
-  const { downloadPdf, renderPreviewImage, isLoading } = useExportCanvas(
-    flowInstance.current
-  );
-  const handleJsonExport = () => {
-    const exportData = [] as {
-      layout: PlotParams["layout"];
-      data: PlotParams["data"];
-    }[];
-    const chartElements = document
-      .querySelector(".react-flow__viewport")
-      ?.querySelectorAll(".p-chart");
-    chartElements?.forEach((el) => {
-      const chartComponent = el as HTMLDivElement & PlotParams;
-      exportData.push({
-        layout: chartComponent.layout,
-        data: chartComponent.data,
-      });
-    });
-
-    // download the data as a JSON file
-    const data = JSON.stringify(exportData, null, 2);
-    const blob = new Blob([data], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const aTag = document.createElement("a");
-    aTag.href = url;
-    aTag.download = "data.json";
-    aTag.click();
-  };
+  const { downloadPdf, renderPreviewImage, isLoading, downloadJson } =
+    useExportCanvas(flowInstance.current);
 
   const handleExportDialogSubmit = (selectedTab: "pdf" | "json") => {
     if (selectedTab === "pdf") {
       downloadPdf();
     } else if (selectedTab === "json") {
-      handleJsonExport();
+      downloadJson();
     }
     setDialogOpen(false);
   };
@@ -224,16 +197,18 @@ const Canvas = () => {
       (id) => !nodes.find((node) => node.id === id)
     );
 
-    const nodesToBeAdded = newChartIds.map((id, index) => ({
-      id,
-      type: "chart",
-      position: getXYDefaultPlacement(
-        filteredNodes.length - initialNodes.length + index
-      ), // TODO: calculate position in a better way
-      data: {
-        chartId: id,
-      },
-    }));
+    const nodesToBeAdded: Node<ChartNodeData>[] = newChartIds.map(
+      (id, index) => ({
+        id,
+        type: "chart",
+        position: getXYDefaultPlacement(
+          filteredNodes.length - initialNodes.length + index
+        ), // TODO: calculate position in a better way
+        data: {
+          chartId: id,
+        },
+      })
+    );
 
     if (filteredNodes.length === nodes.length && newChartIds.length === 0)
       return;
@@ -254,7 +229,12 @@ const Canvas = () => {
         if (!node) return prevNodes;
         flowInstance.current.fitView({ nodes: [node], duration: 500 });
 
-        return prevNodes;
+        // Set the selected node based on the activeChartId
+        const newNodes = prevNodes.map((n) => ({
+          ...n,
+          selected: n.id === activeChartId,
+        }));
+        return newNodes;
       });
     }, 50);
   }, [activeChartId, nodes.length, flowInstance.current]);
@@ -277,6 +257,7 @@ const Canvas = () => {
         edges={edges}
         onEdgesChange={onEdgesChange}
         onNodesChange={onNodesChange}
+        onNodeDrag={console.log}
         nodeTypes={nodeTypes}
         nodesDraggable={true}
         nodeDragThreshold={1}

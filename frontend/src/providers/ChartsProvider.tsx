@@ -35,16 +35,14 @@ interface ChartsProviderProps {
   children: React.ReactNode;
 }
 
-function createInitialChartState() {
-  const newChartId = nanoid();
-  const newTraceId = nanoid();
+function createInitialChartState(chartId = nanoid(), traceId = nanoid()) {
   return {
     ...emptyChart,
-    id: newChartId,
+    id: chartId,
     traces: [
       {
         ...emptyTrace,
-        id: newTraceId,
+        id: traceId,
         barColor: getRandomPlotlyColor(),
         lineColor: getRandomPlotlyColor(),
         markerColor: getRandomPlotlyColor(),
@@ -94,7 +92,10 @@ const ChartsProvider = ({ children, files }: ChartsProviderProps) => {
   const handleAddChart = useCallback(() => {
     const newChartId = nanoid();
     const newTraceId = nanoid();
-    setCharts((prevCharts) => [...prevCharts, createInitialChartState()]);
+    setCharts((prevCharts) => [
+      ...prevCharts,
+      createInitialChartState(newChartId, newTraceId),
+    ]);
     setActiveChartId(newChartId);
     setActiveTraceId(newTraceId);
   }, [charts]);

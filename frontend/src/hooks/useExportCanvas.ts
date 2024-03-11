@@ -7,6 +7,7 @@ import { jsPDF } from "jspdf";
 import { toPng } from "html-to-image";
 import { a4Extent } from "src/components/consts";
 import { useCallback, useState } from "react";
+import { PlotParams } from "react-plotly.js";
 
 export const exportReactFlowToImgDataUrl = async (
   width: number,
@@ -125,5 +126,31 @@ export function useExportCanvas(reactFlowInstance?: ReactFlowInstance) {
     });
   }, [reactFlowInstance]);
 
-  return { downloadPdf, renderPreviewImage, isLoading };
+  const downloadJson = useCallback(() => {
+    const exportData = [] as {
+      layout: PlotParams["layout"];
+      data: PlotParams["data"];
+    }[];
+    const chartElements = document
+      .querySelector(".react-flow__viewport")
+      ?.querySelectorAll(".p-chart");
+    chartElements?.forEach((el) => {
+      const chartComponent = el as HTMLDivElement & PlotParams;
+      exportData.push({
+        layout: chartComponent.layout,
+        data: chartComponent.data,
+      });
+    });
+
+    // download the data as a JSON file
+    const data = JSON.stringify(exportData, null, 2);
+    const blob = new Blob([data], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const aTag = document.createElement("a");
+    aTag.href = url;
+    aTag.download = "data.json";
+    aTag.click();
+  }, []);
+
+  return { downloadPdf, renderPreviewImage, downloadJson, isLoading };
 }
