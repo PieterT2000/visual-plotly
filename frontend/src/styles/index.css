@@ -5,47 +5,56 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
+    --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
+    --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 142.1 76.2% 36.3%;
-    --primary-foreground: 355.7 100% 97.3%;
-    --secondary: #353535;
-    --secondary-foreground: #f7f7f7;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: #f7f7f7;
-    --accent-foreground: #353535;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: #353535;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --border-apple: rgba(96, 96, 96, 0.46);
+    --fill-apple: rgba(246,246,246,0.36);
+    --shadow-apple: 0 0 6px 0 rgba(0,0,0,0.15);
+    --radius-apple: 16px;
     --radius: 0.5rem;
+    --dark: #353535;
+    --dark-foreground: #f7f7f7;
+    --shadow-vert: 0 4 7px 0 rgba(0,0,0,0.10);
   }
  
   .dark {
-    --background: 20 14.3% 4.1%;
-    --foreground: 0 0% 95%;
-    --card: 24 9.8% 10%;
-    --card-foreground: 0 0% 95%;
-    --popover: 0 0% 9%;
-    --popover-foreground: 0 0% 95%;
-    --primary: 142.1 70.6% 45.3%;
-    --primary-foreground: 144.9 80.4% 10%;
-    --secondary: #353535;
-    --secondary-foreground: #f7f7f7;
-    --muted: 0 0% 15%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: #f7f7f7;
-    --accent-foreground: #353535;
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 85.7% 97.3%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: #353535;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+    --dark: #353535;
+    --dark-foreground: #f7f7f7;
   }
 }
 
@@ -58,3 +67,68 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  /* Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+}
+
+@layer components {
+  .chart_thumb-overlay::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    @apply rounded-apple bg-black bg-opacity-0 transition-opacity z-10;
+  } 
+
+  .chart_thumb-container:hover .chart_thumb-delete {
+    @apply opacity-100;
+  }
+  .chart_thumb-container:hover .chart_thumb-overlay::before {
+    @apply bg-opacity-50;
+  }
+  .chart_thumb-container:hover .chart_thumb-overlay {
+    @apply opacity-100;
+  }
+
+  .chart_thumb-delete {
+    width: 20px;
+    height: 20px;
+    background: #FF3B30;
+    box-shadow: 0px 1px 1.5px 0px rgba(0, 0, 0, 0.25);
+    margin: -9px;
+    @apply absolute top-0 right-0 rounded-full text-white flex items-center justify-center text-[15px] z-20 opacity-0 transition-all;
+    .icon {
+      @apply h-4;
+    }
+  }
+  .chart_thumb-delete::after {
+    content: "Delete";
+    visibility: hidden;
+    @apply text-sm box-border w-0 h-0 relative items-center opacity-0 transition-none delay-0;
+  }
+
+  .chart_thumb-delete:hover {
+    width: 100%;
+    @apply px-1;
+  }
+  .chart_thumb-delete:hover::after {
+    visibility: visible;
+    @apply w-full h-full opacity-100 transition-opacity duration-150;
+  }
+}
+
+.react-flow__edge {
+  pointer-events: none;
+}
+

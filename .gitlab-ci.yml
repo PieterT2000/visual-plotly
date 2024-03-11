@@ -3,59 +3,91 @@ stages:
   - build
   - deploy
 
+# Improve the (de-)compression speed by using a more efficient ZIP implementation
 variables:
-  CI_NODE_INDEX: "0"
-  SHELL: "/bin/bash"
+  FF_USE_FASTZIP: "true"
+  ARTIFACT_COMPRESSION_LEVEL: "fast"
+  CACHE_COMPRESSION_LEVEL: "fast"
+  npm_config_cache: "$CI_PROJECT_DIR/.npm"
 
 default:
   image: node:18
+  interruptible: true
+  # Provide tag to ensure jobs are picked up by the right runner
+  tags:
+    - node
+
+# Hidden npm cache handling job re-used by all other jobs
+.dependencies_cache:
   cache:
     key:
+      # Invalidate the cache whenever the hash of these files changes
       files:
         - frontend/package-lock.json
-      prefix: npm
+    # Note: caching node_modules is NOT a good idea when using NPM as package manager (with "npm ci")
     paths:
       - frontend/node_modules/
+      - .npm/
+    # Most jobs only need to pull the cache, so we configure "pull" policy ("pull-push" is the default)
+    policy: pull
+
+# Pipeline should run for merge requests and default branch pushes (main)
+workflow:
+  rules:
+    # For merge requests or pushes to develop branch - deploy to staging
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == 'develop' || $CI_COMMIT_BRANCH == 'develop'
+    # For pushes to main branch - deploy to production
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 test:unit:
   stage: qa
+  extends:
+    - .dependencies_cache
+  cache: # override only the policy
+    policy: pull-push
   before_script:
     - cd frontend
-    - npm install
+    - npm ci --prefer-offline
   script:
     - npm run test
 
 build:
   stage: build
+  extends:
+    - .dependencies_cache
   before_script:
     - cd frontend
-    - npm install
+    - npm ci --prefer-offline
   script:
     - npm run build
-  cache:
-    paths:
-      - frontend/dist
   artifacts:
     paths:
       - frontend/dist/
-    expire_in: 60 mins
-  # rules:
-  #   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    expire_in: 15 mins
 
 deploy:s3:
   stage: deploy
+  environment:
+    name: $ENV_NAME
   image:
     name: amazon/aws-cli:latest
     entrypoint:
       - "/usr/bin/env"
   script:
-    - cd frontend
+    - if [ "$ENV_NAME" = "production" ]; then S3_BUCKET=$S3_BUCKET_PROD; CLOUDFRONT_ID=ED87W9YWEWNCM; fi
+    - if [ "$ENV_NAME" = "staging" ]; then S3_BUCKET=$S3_BUCKET_STAGING; CLOUDFRONT_ID=EDZU9V56VO4O9; fi
+    - echo "Deploying to $ENV_NAME, S3 bucket is $S3_BUCKET"
     - export AWS_DEFAULT_REGION=eu-west-2
     - export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
     - export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
-    - aws s3 sync dist/ s3://$S3_BUCKET
+    - aws s3 sync frontend/dist/ s3://$S3_BUCKET
     # https://stackoverflow.com/a/37752872/9713831 - clear CloudFront cache
-    - aws cloudfront create-invalidation --distribution-id=ED87W9YWEWNCM --paths /
-  # rules:
-  #   - if: '$CI_COMMIT_REF_NAME == "main"'
-  #     when: always
+    - aws cloudfront create-invalidation --distribution-id=$CLOUDFRONT_ID --paths /
+  # https://gitlab.com/gitlab-org/gitlab/-/issues/357792
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      variables:
+        ENV_NAME: production
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" || $CI_COMMIT_BRANCH == "develop"
+      variables:
+        ENV_NAME: staging
