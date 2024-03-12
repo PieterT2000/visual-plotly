@@ -43,7 +43,7 @@ export function determineValidChartTypes(data: Data2D): ChartType[] {
   // if x is numeric and y is string
   if (isXNumeric && isYString) {
     // TODO: support horizontal bar chart
-    validChartTypes.push("pie", "scatter");
+    validChartTypes.push("scatter");
     if (hasUniqueYValues) {
       validChartTypes.push("line");
     }
@@ -54,6 +54,7 @@ export function determineValidChartTypes(data: Data2D): ChartType[] {
 
 /**
  * This function takes an array of object key paths and groups them into a tree-like structure
+ * All leaf key parts are grouped into an array called "elements"
  */
 export function groupKeysToObject(keys: string[]): GroupedObject {
   const result: GroupedObject = {};
@@ -85,7 +86,7 @@ export function groupKeysToObject(keys: string[]): GroupedObject {
 }
 
 /**
- * This function takes an object and returns an array of all the (nested) paths to properties whose values are of type array.
+ * This function takes an object (no array!) and returns an array of all the (nested) paths to properties whose values are of type array.
  */
 export function getFilteredObjectPaths(
   obj: any,
@@ -94,7 +95,8 @@ export function getFilteredObjectPaths(
 ): string[] {
   let arrayPaths: string[] = [];
 
-  if (typeof obj !== "object" || obj === null) return arrayPaths;
+  if (typeof obj !== "object" || obj === null || Array.isArray(obj))
+    return arrayPaths;
 
   for (const key in obj) {
     // eslint-disable-next-line

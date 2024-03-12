@@ -1,13 +1,16 @@
-Production [![pipeline status](https://stgit.dcs.gla.ac.uk/team-project-h/2023/sh27/sh27-main/badges/main/pipeline.svg)](https://stgit.dcs.gla.ac.uk/team-project-h/2023/sh27/sh27-main/-/commits/main)
-
-Staging [![pipeline status](https://stgit.dcs.gla.ac.uk/team-project-h/2023/sh27/sh27-main/badges/develop/pipeline.svg)](https://stgit.dcs.gla.ac.uk/team-project-h/2023/sh27/sh27-main/-/commits/develop)
-
 # Team SH27 Main Project - Team Project 3 Course 2023-24
 
-### Deployment
+## Docs
+
+- [Frontend](/frontend/README.md) (read 'em, they will save you time 💯)
+- [Backend](/backend/README.md) (not relevant anymore)
+
+## Deployment
 
 - [Production](https://plotly.pietervantuijl.com)
 - [Staging/develop](https://plotly-staging.pietervantuijl.com)
+
+## Installation
 
 ### Requirements
 
@@ -15,7 +18,7 @@ Staging [![pipeline status](https://stgit.dcs.gla.ac.uk/team-project-h/2023/sh27
 
 - **Node.js**: Node.js can be downloaded and installed from [Node.js Official Website](https://nodejs.org/en/download). This will also install `npm` automatically, which is the package manager for Node.js.
 
-### Installation
+### Step-by-step
 
 Follow these steps to set up the project locally:
 
@@ -24,7 +27,7 @@ Follow these steps to set up the project locally:
    Clone the project repository to your local machine in the directory of your choice:
 
    ```sh
-   git clone https://stgit.dcs.gla.ac.uk/team-project-h/2023/sh27/sh27-main.git
+   git clone https://github.com/PieterT2000/visual-plotly.git
    ```
 
 2. **Open the Project**
@@ -36,7 +39,7 @@ Follow these steps to set up the project locally:
    Using the terminal, navigate to the frontend folder within the cloned project directory:
 
    ```sh
-   cd ~/sh-27/frontend
+   cd frontend
    ```
 
 4. Install Dependencies
@@ -47,7 +50,7 @@ Follow these steps to set up the project locally:
    npm install
    ```
 
-5. Run the Development Server
+5. Run the Vite Development Server
 
    Start the development server by executing:
 
