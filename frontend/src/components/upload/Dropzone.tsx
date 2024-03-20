@@ -57,8 +57,8 @@ export function Dropzone({ onContinue, className = "" }: DropzoneProps) {
   }, [files]);
 
   return (
-    <div className="w-full md:max-w-[800px]">
-      <div>
+    <div className="w-full md:max-w-[800px] ">
+      <div className="text-center">
         <h3>Upload File</h3>
         <p className="text-sm text-gray-500">
           You can upload 1 file. The file must have a .json extension.
@@ -92,7 +92,9 @@ export function Dropzone({ onContinue, className = "" }: DropzoneProps) {
         }}
       />
       {!!validFiles.length && (
-        <Button onClick={handleContinue}>Continue</Button>
+          <div className="flex justify-center">
+          <Button onClick={handleContinue}>Continue</Button>
+        </div>
       )}
     </div>
   );

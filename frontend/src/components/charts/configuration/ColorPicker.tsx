@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { useToggle, useOnClickOutside } from "usehooks-ts";
 import { ColorResult, TwitterPicker } from "react-color";
 import { Label } from "src/components/ui/label";
-import { defaultPlotlyColors } from "src/utils/colors";
+import { defaultResColors } from "src/utils/colorsRES";
 
 interface ColorPickerProps {
   label: string;
@@ -29,7 +29,7 @@ const ColorPicker = ({ label, color, onChange }: ColorPickerProps) => {
           <div className="absolute -top-[100px]">
             <TwitterPicker
               color={color}
-              colors={defaultPlotlyColors}
+              colors={defaultResColors}
               onChange={onChange}
               triangle="top-left"
               // Hack to position the triangle at the bottom
