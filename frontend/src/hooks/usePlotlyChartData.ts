@@ -7,6 +7,7 @@ import {
   Trace,
   useChartsContext,
 } from "src/providers/context/ChartsContext";
+import { defaultResColors } from "src/utils/colorsRES";
 
 type DataToBePlotted = { [key: string]: number | string }[];
 
@@ -39,6 +40,14 @@ const plotDataSelectors: Record<ChartType, PlotDataSelector> = {
     return {
       type: "pie",
       labels,
+      marker: {
+        colors: defaultResColors,
+      line: {
+        color: "black",
+        width: 0.4,
+      },
+      },
+      automargin: true,
       values,
       extra: {
         aspect: 1,

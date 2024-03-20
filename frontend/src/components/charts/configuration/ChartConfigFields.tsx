@@ -8,7 +8,7 @@ const ChartConfigFields = () => {
   const { handleUpdateChart, activeChart } = useChartsContext();
   return (
     <div className="px-2">
-      <TypographyH3 className="mb-6 ">Chart Options</TypographyH3>
+      <TypographyH3 className="mb-6 ">&nbsp;Chart Options</TypographyH3>
       <div className="space-y-2">
         <div className="space-y-2 px-2">
           <Label htmlFor="documentTitle">Title</Label>

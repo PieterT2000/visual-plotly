@@ -106,7 +106,7 @@ const TraceConfigFields = () => {
 
   return (
     <div className="px-2">
-      <TypographyH3 className="mb-6">Traces Options</TypographyH3>
+      <TypographyH3 className="mb-6">&nbsp;Trace Options</TypographyH3>
       <div className="border-dark border-b flex mx-2 mb-4 overflow-auto">
         {activeChart?.traces.map((trace, idx) => (
           <Button

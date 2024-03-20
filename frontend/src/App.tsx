@@ -23,7 +23,7 @@ function App() {
       {view === "dropzone" && (
         <div className="h-screen flex flex-col justify-center items-center space-y-12 px-5">
           <TypographyH1>Visual Plotly</TypographyH1>
-          <TypographyP className="w-full md:max-w-[800px]">
+          <TypographyP className="w-full md:max-w-[800px] text-center">
             Visual Plotly makes creating charts easy. Just adjust them visually,
             and it instantly gives you the chart and Python code. Simplify your
             data visualization with Visual Plotly.
