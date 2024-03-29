@@ -1,5 +1,4 @@
 public
 .gitlab-ci-local
-output.json
 .DS_Store
 .npm
