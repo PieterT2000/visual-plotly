@@ -125,8 +125,6 @@ The list of valid chart types, shown to the user in the dropdown upon selection 
 
 The functions responsible for parsing the uploaded JSON file and showing possible data keys to be selected by the user can be found in the [data-utils.ts](src/components/charts/configuration/data-utils.ts) file. By default, only the keys whose values are of type `Array` will be shown to the user in the _Select Data Key_ dropdown.
 The [DataKeySelectBox](src/components/charts/configuration/DataKeySelectBox.tsx) component is responsible for selecting those keys and rendering them inside a dropdown.
-<<<<<<< HEAD
-=======
 
 ### Future work
 
@@ -134,4 +132,3 @@ The user may be supported to generate multiple-page pdfs rather than single-page
 Also, the drag-n-drop functionality for chart nodes may be made more constrained by using templates.
 These changes may benefit from using a different library than the react-flow library currently in use. For example, [react-grid-layout](https://github.com/react-grid-layout/react-grid-layout) would be well suited to this.
 Lastly, the application could be made stateful by saving pdf configurations to persistence storage.
->>>>>>> develop
